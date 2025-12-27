@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./TypeChart.css";
 import React from "react";
 
@@ -116,6 +117,8 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
 export const TypeChartTable: React.FC<Props> = ({ chart, gen }) => {
   const atkTypes = Object.keys(chart) as TypeName[];
   const defTypes = defTypesByGen[gen];
+  const [hoverRow, setHoverRow] = useState<number | null>(null);
+  const [hoverCol, setHoverCol] = useState<number | null>(null);
 
   function invert(eff: number): number {
     if (eff === 2) return 0.5;
@@ -144,23 +147,52 @@ export const TypeChartTable: React.FC<Props> = ({ chart, gen }) => {
         <thead>
           <tr>
             <th></th>
+            <th></th>
+            <th colSpan={defTypes.length}>防御タイプ</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th></th>
             {defTypes.map((def) => (
               <th key={def}>{def}</th>
             ))}
           </tr>
         </thead>
-
         <tbody>
-          {atkTypes.map((atk) => (
+          {atkTypes.map((atk, rowIndex) => (
             <tr key={atk}>
+              {rowIndex === 0 ? (
+                <th rowSpan={atkTypes.length} className="vertical">
+                  攻撃タイプ
+                </th>
+              ) : null}
+
               <th>{atk}</th>
-              {defTypes.map((def) => {
+
+              {defTypes.map((def, defIndex) => {
                 let eff = chart[atk]?.[def] ?? 1;
-                if (gen === "gen4") {
-                  eff = invert(eff);
-                }
+                if (gen === "gen4") eff = invert(eff);
+
                 return (
-                  <td key={def} className={getClassName(eff)}>
+                  <td
+                    key={def}
+                    onMouseEnter={() => {
+                      setHoverRow(rowIndex);
+                      setHoverCol(defIndex); // ← ここで defIndex が使える
+                    }}
+                    onMouseLeave={() => {
+                      setHoverRow(null);
+                      setHoverCol(null);
+                    }}
+                    className={[
+                      getClassName(eff),
+                      hoverRow === rowIndex ? "hover-row" : "",
+                      hoverCol === defIndex ? "hover-col" : "",
+                      hoverRow === rowIndex && hoverCol === defIndex
+                        ? "hover-cell"
+                        : "",
+                    ].join(" ")}
+                  >
                     {toSymbol(eff)}
                   </td>
                 );
