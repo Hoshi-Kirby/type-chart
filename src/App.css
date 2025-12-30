@@ -104,6 +104,7 @@ table tr:nth-child(18) {
 .hover-cell {
   background-color: rgba(0, 0, 0, 0.2);
   font-weight: bold;
+  position: relative;
 }
 
 /* 補完 */
@@ -120,4 +121,30 @@ table tr:nth-child(18) {
   flex-direction: row; /* ← 横並びにする */
   align-items: center; /* ← 縦位置を揃える */
   gap: 8px; /* ← ラベルとselectの間の余白 */
+}
+.toggle-button {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+.ability-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 6px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.ability-list div {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
 }

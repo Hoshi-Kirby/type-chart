@@ -18,3 +18,4 @@ export type TypeName =
   | "鋼"
   | "妖"
   | "-";
+export type SpecialMove = "1" | "2" | "3" | "4";

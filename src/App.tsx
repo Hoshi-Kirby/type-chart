@@ -4,6 +4,7 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { TypeChartTable } from "./TypeChart";
 import { DualTypeChartTable } from "./DualTypeChart";
+import { CoverTypeChartTable } from "./CoverTypeChart";
 import type { TypeName } from "./value";
 
 type Gen = "gen1" | "gen2" | "gen3" | "gen4";
@@ -130,6 +131,9 @@ export default function App() {
     lightningRod: false,
     flashFire: false,
     sapSipper: false,
+    suihou: false,
+    tainetu: false,
+    kiyome: false,
     gutsy: false, // 肝っ玉
   });
 
@@ -167,164 +171,113 @@ export default function App() {
         </div>
       )}
       {mode === "dual" && (
-        <div className="layout-row">
-          <p>攻撃タイプ</p>
-          <select
-            value={atkType}
-            onChange={(e) => setAtkType(e.target.value as TypeName)}
-          >
-            {atkTypesByGen[gen].map((t) => (
-              <option key={t} value={t}>
-                {typeLabels[t]}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      {mode === "dual" && (
-        <div className="chart-wrapper">
-          {chartForGen && (
-            <DualTypeChartTable
-              atkType={atkType}
-              chart={chartForGen}
-              gen={gen}
-            />
-          )}
-        </div>
+        <>
+          <div className="layout-row">
+            <p>攻撃タイプ</p>
+            <select
+              value={atkType}
+              onChange={(e) => setAtkType(e.target.value as TypeName)}
+            >
+              {atkTypesByGen[gen].map((t) => (
+                <option key={t} value={t}>
+                  {typeLabels[t]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="chart-wrapper">
+            {chartForGen && (
+              <DualTypeChartTable
+                atkType={atkType}
+                chart={chartForGen}
+                gen={gen}
+              />
+            )}
+          </div>
+        </>
       )}
       {mode === "cover" && (
-        <div style={{ width: "100%" }}>
-          <div className="cover-types">
-            <h3>攻撃タイプ</h3>
+        <>
+          <div style={{ width: "100%" }}>
+            <div className="cover-types">
+              <h3>攻撃タイプ</h3>
 
-            <div className="atk-grid">
-              {atkTypes.map((t, i) => (
-                <div key={i} className="atk-item">
-                  <p>{i >= 4 ? "例外" : `技 ${i + 1}`}</p>
-                  <select
-                    value={t}
-                    onChange={(e) => {
-                      const newArr = [...atkTypes];
-                      newArr[i] = e.target.value as TypeName;
-                      setAtkTypes(newArr);
-                    }}
-                  >
-                    <option value="-">-</option> {}
-                    {atkTypesByGen[gen].map((type) => (
-                      <option key={type} value={type}>
-                        {typeLabels[type]}
-                      </option>
-                    ))}
-                    {(gen === "gen3" || gen === "gen4") && (
-                      <>
-                        <option value="1">フリーズドライ</option>
-                        <option value="2">フライングプレス</option>
-                        <option value="3">サウザンアロー</option>
-                        <option value="4">無に帰す光</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-              ))}
+              <div className="atk-grid">
+                {atkTypes.map((t, i) => (
+                  <div key={i} className="atk-item">
+                    <p>{i >= 4 ? "例外" : `技 ${i + 1}`}</p>
+                    <select
+                      value={t}
+                      onChange={(e) => {
+                        const newArr = [...atkTypes];
+                        newArr[i] = e.target.value as TypeName;
+                        setAtkTypes(newArr);
+                      }}
+                    >
+                      <option value="-">-</option> {}
+                      {atkTypesByGen[gen].map((type) => (
+                        <option key={type} value={type}>
+                          {typeLabels[type]}
+                        </option>
+                      ))}
+                      {(gen === "gen3" || gen === "gen4") && (
+                        <>
+                          <option value="1">フリーズドライ</option>
+                          <option value="2">フライングプレス</option>
+                          {gen === "gen3" && (
+                            <>
+                              <option value="3">サウザンアロー</option>
+                              <option value="4">無に帰す光</option>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </select>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          {(gen === "gen2" || gen === "gen3" || gen === "gen4") && (
-            <>
-              <div className="ability-box">
+            {(gen === "gen2" || gen === "gen3" || gen === "gen4") && (
+              <>
                 <h3>特性</h3>
-
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={abilities.gutsy}
+                    onChange={(e) =>
+                      setAbilities({ ...abilities, gutsy: e.target.checked })
+                    }
+                  />
+                  肝っ玉/心眼
+                </label>
                 <label>
                   <input
                     type="checkbox"
                     checked={abilities.levitate}
                     onChange={(e) =>
-                      setAbilities({ ...abilities, levitate: e.target.checked })
-                    }
-                  />
-                  浮遊
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={abilities.waterAbsorb}
-                    onChange={(e) =>
                       setAbilities({
                         ...abilities,
-                        waterAbsorb: e.target.checked,
+                        levitate: e.target.checked,
                       })
                     }
                   />
-                  貯水
+                  相手の特性を考慮
                 </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={abilities.thickFat}
-                    onChange={(e) =>
-                      setAbilities({ ...abilities, thickFat: e.target.checked })
-                    }
-                  />
-                  厚い脂肪
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={abilities.lightningRod}
-                    onChange={(e) =>
-                      setAbilities({
-                        ...abilities,
-                        lightningRod: e.target.checked,
-                      })
-                    }
-                  />
-                  避雷針/蓄電
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={abilities.flashFire}
-                    onChange={(e) =>
-                      setAbilities({
-                        ...abilities,
-                        flashFire: e.target.checked,
-                      })
-                    }
-                  />
-                  貰い火
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={abilities.sapSipper}
-                    onChange={(e) =>
-                      setAbilities({
-                        ...abilities,
-                        sapSipper: e.target.checked,
-                      })
-                    }
-                  />
-                  草食
-                </label>
-              </div>
-
-              <label>
-                <input
-                  type="checkbox"
-                  checked={abilities.gutsy}
-                  onChange={(e) =>
-                    setAbilities({ ...abilities, gutsy: e.target.checked })
-                  }
-                />
-                肝っ玉/心眼
-              </label>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
+          <div className="chart-wrapper">
+            {chartForGen && (
+              <CoverTypeChartTable
+                atkTypes={atkTypes}
+                chart={chartForGen}
+                gen={gen}
+                gutsy={abilities.gutsy}
+                levitate={abilities.levitate}
+              />
+            )}
+          </div>
+        </>
       )}
     </div>
   );
