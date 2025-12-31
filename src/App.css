@@ -6,21 +6,62 @@ body,
   margin: 0;
   padding: 0;
 }
+.back {
+  position: fixed;
+  inset: 0;
+  background-image: url("/image/sv.jpg");
+  background-size: cover;
+  background-position: center;
+  z-index: -1; /* 後ろに置く */
+}
 .layout-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-left: 20px;
 }
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #00c3ff;
+  text-shadow: 0 0 2px #004576, 0 0 10px #00c3ff, 0 0 10px #00c3ff;
+  letter-spacing: 1px;
+}
 
 .chart-wrapper {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   width: auto;
-  background: white;
+  background: rgba(66, 113, 133, 0);
   padding: 20px;
   z-index: 9999;
+}
+.app-wrapper {
+  position: fixed; /* ← 画面全体に固定 */
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+
+  border-radius: 20px;
+  background: rgba(121, 66, 133, 0.4);
+  backdrop-filter: blur(3px);
+  border: 2px solid rgba(135, 135, 135, 0.338);
+
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto; /* 中身が大きいときスクロール */
+}
+@media (max-width: 1055px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .chart-wrapper {
+    position: static;
+    width: 95%;
+  }
 }
 table th,
 table td {
@@ -108,7 +149,20 @@ table tr:nth-child(18) {
 }
 
 /* 補完 */
+.atk-grid {
+  display: grid;
+  grid-template-columns: auto auto; /* ← fr をやめて auto にする */
+  gap: 12px 24px;
+  margin-top: 8px;
+  justify-content: start; /* ← グリッド全体を左寄せ */
+}
 
+.atk-item {
+  display: flex;
+  flex-direction: row; /* ← 横並びにする */
+  align-items: center; /* ← 縦位置を揃える */
+  gap: 10px; /* ← ラベルとselectの間の余白 */
+}
 .toggle-button {
   font-size: 12px;
   padding: 2px 6px;
@@ -134,4 +188,20 @@ table tr:nth-child(18) {
   font-size: 11px;
   border: 1px solid #ccc;
   white-space: nowrap;
+}
+
+/* 防御 */
+.def-grid {
+  display: grid;
+  grid-template-columns: auto auto; /* ← fr をやめて auto にする */
+  gap: 2px 24px;
+  margin-top: 8px;
+  justify-content: start; /* ← グリッド全体を左寄せ */
+}
+
+.def-item {
+  display: flex;
+  flex-direction: row; /* ← 横並びにする */
+  align-items: center; /* ← 縦位置を揃える */
+  gap: 10px; /* ← ラベルとselectの間の余白 */
 }

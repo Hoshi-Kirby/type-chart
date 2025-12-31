@@ -625,19 +625,21 @@ export const CoverTypeChartTable: React.FC<Props> = ({
                     abilities.length > 0 ? "everyday" : "",
                   ].join(" ")}
                 >
-                  {toSymbol(eff)}
+                  <div className="squ">
+                    {toSymbol(eff)}
 
-                  {hoverRow === rowIndex &&
-                  hoverCol === colIndex &&
-                  abilities.length > 0 ? (
-                    <div className="abilities">
-                      {abilities.map((a) => (
-                        <div>{a}</div>
-                      ))}
-                    </div>
-                  ) : (
-                    ""
-                  )}
+                    {hoverRow === rowIndex &&
+                    hoverCol === colIndex &&
+                    abilities.length > 0 ? (
+                      <div className="abilities">
+                        {abilities.map((a) => (
+                          <div>{a}</div>
+                        ))}
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
                 </td>
               );
             })}

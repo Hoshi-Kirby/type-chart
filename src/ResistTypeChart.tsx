@@ -12,12 +12,12 @@ type TypeChart = {
 type Gen = "gen1" | "gen2" | "gen3" | "gen4";
 
 type Props = {
-  atkType: TypeName;
+  defTypes: TypeName[];
   chart: TypeChart;
   gen: Gen;
 };
 
-const defTypesByGen: Record<Gen, TypeName[]> = {
+const atkTypesByGen: Record<Gen, TypeName[]> = {
   gen1: [
     "普",
     "炎",
@@ -33,7 +33,6 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
     "虫",
     "岩",
     "霊",
-    "竜",
   ],
   gen2: [
     "普",
@@ -96,12 +95,13 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
   ],
 };
 
-export const DualTypeChartTable: React.FC<Props> = ({
-  atkType,
+export const ResistTypeChartTable: React.FC<Props> = ({
+  defTypes,
   chart,
   gen,
 }) => {
-  const types = defTypesByGen[gen];
+  const types = atkTypesByGen[gen];
+  const poke = ["1", "2", "3", "4", "5", "6"];
   const [hoverRow, setHoverRow] = useState<number | null>(null);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
 
@@ -133,12 +133,12 @@ export const DualTypeChartTable: React.FC<Props> = ({
         <tr>
           <th></th>
           <th></th>
-          <th colSpan={types.length}>タイプ2</th>
+          <th colSpan={types.length}>ポケモン</th>
         </tr>
         <tr>
           <th></th>
           <th></th>
-          {types.map((t) => (
+          {poke.map((t) => (
             <th key={t}>{t}</th>
           ))}
         </tr>
@@ -149,30 +149,25 @@ export const DualTypeChartTable: React.FC<Props> = ({
           <tr key={type1}>
             {rowIndex === 0 && (
               <th rowSpan={types.length} className="vertical">
-                タイプ1
+                攻撃タイプ
               </th>
             )}
             <th>{type1}</th>
 
-            {types.map((type2, colIndex) => {
+            {poke.map((num, colIndex) => {
               let eff: number;
 
-              if (type1 === type2) {
-                // 同タイプ同士 → 単タイプ扱い
-                eff = chart[atkType]?.[type1] ?? 1;
-                if (gen === "gen4") eff = invert(eff);
-              } else {
-                // 通常の複合計算
-                const eff1 = chart[atkType]?.[type1] ?? 1;
-                const eff2 = chart[atkType]?.[type2] ?? 1;
-                const e1 = gen === "gen4" ? invert(eff1) : eff1;
-                const e2 = gen === "gen4" ? invert(eff2) : eff2;
-                eff = e1 * e2;
+              let eff1 = chart[type1]?.[defTypes[colIndex * 2]] ?? 1;
+              let eff2 = chart[type1]?.[defTypes[colIndex * 2 + 1]] ?? 1;
+              if (gen === "gen4") {
+                eff1 = invert(eff1);
+                eff2 = invert(eff2);
               }
+              eff = eff1 * eff2;
 
               return (
                 <td
-                  key={type2}
+                  key={num}
                   onMouseEnter={() => {
                     setHoverRow(rowIndex);
                     setHoverCol(colIndex);

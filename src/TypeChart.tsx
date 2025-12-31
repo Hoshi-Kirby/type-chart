@@ -193,7 +193,7 @@ export const TypeChartTable: React.FC<Props> = ({ chart, gen }) => {
                         : "",
                     ].join(" ")}
                   >
-                    {toSymbol(eff)}
+                    <div className="squ">{toSymbol(eff)}</div>
                   </td>
                 );
               })}
