@@ -108,20 +108,7 @@ table tr:nth-child(18) {
 }
 
 /* 補完 */
-.atk-grid {
-  display: grid;
-  grid-template-columns: auto auto; /* ← fr をやめて auto にする */
-  gap: 12px 24px;
-  margin-top: 8px;
-  justify-content: start; /* ← グリッド全体を左寄せ */
-}
 
-.atk-item {
-  display: flex;
-  flex-direction: row; /* ← 横並びにする */
-  align-items: center; /* ← 縦位置を揃える */
-  gap: 8px; /* ← ラベルとselectの間の余白 */
-}
 .toggle-button {
   font-size: 12px;
   padding: 2px 6px;
