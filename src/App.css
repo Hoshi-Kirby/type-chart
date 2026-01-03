@@ -9,7 +9,7 @@ body,
 .back {
   position: fixed;
   inset: 0;
-  background-image: url("/image/sv.jpg");
+  background-image: url("/image/sq.jpg");
   background-size: cover;
   background-position: center;
   z-index: -1; /* 後ろに置く */
@@ -23,8 +23,8 @@ body,
 .title {
   font-size: 36px;
   font-weight: 700;
-  color: #00c3ff;
-  text-shadow: 0 0 2px #004576, 0 0 10px #00c3ff, 0 0 10px #00c3ff;
+  color: #b5e1ffe0;
+  text-shadow: 0 0 2px #004576, 0 0 10px #6fc4fde0, 0 0 10px #6fc4fde0;
   letter-spacing: 1px;
 }
 
@@ -45,8 +45,8 @@ body,
   bottom: 10px;
 
   border-radius: 20px;
-  background: rgba(121, 66, 133, 0.4);
-  backdrop-filter: blur(3px);
+  background: rgba(255, 255, 255, 0.573);
+  backdrop-filter: blur(6px);
   border: 2px solid rgba(135, 135, 135, 0.338);
 
   padding: 20px;
