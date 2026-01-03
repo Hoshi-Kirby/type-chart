@@ -188,6 +188,7 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
   ],
 };
 export default function App() {
+  const [help, setHelp] = useState<boolean>(false);
   const [allCharts, setAllCharts] = useState<any>({});
   const [gen, setGen] = useState<Gen>("gen3");
   const chartForGen = gen === "gen4" ? allCharts["gen3"] : allCharts[gen];
@@ -240,15 +241,28 @@ export default function App() {
       <div className="back"></div>
       <div className="app-wrapper">
         <div className="container">
-          <div>
-            <h1 className="title">タイプ相性表</h1>
-          </div>
+          <h1 className="title">タイプ相性表</h1>
+          {help === false ? (
+            <button className="help-button" onClick={() => setHelp(true)}>
+              使い方∨
+            </button>
+          ) : (
+            <>
+              <button className="help-button" onClick={() => setHelp(false)}>
+                使い方∧
+              </button>
+              <div>
+                <div>あいうえお</div>
+              </div>
+            </>
+          )}
+
           <div className="layout-row">
             <p>世代</p>
             <select value={gen} onChange={(e) => setGen(e.target.value as Gen)}>
               <option value="gen1">赤緑</option>
-              <option value="gen2">金銀~BW</option>
-              <option value="gen3">XY~</option>
+              <option value="gen2">金銀～BW</option>
+              <option value="gen3">XY～</option>
               <option value="gen4">さかさ</option>
             </select>
           </div>
@@ -257,7 +271,7 @@ export default function App() {
             <select value={mode} onChange={(e) => setMode(e.target.value)}>
               <option value="single">タイプ相性</option>
               <option value="dual">対複合相性</option>
-              <option value="cover">相性補完</option>
+              <option value="cover">技範囲</option>
               <option value="resist">複合耐性</option>
             </select>
           </div>

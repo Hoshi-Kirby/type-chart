@@ -20,12 +20,26 @@ body,
   gap: 8px;
   margin-left: 20px;
 }
+.header {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
 .title {
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 400;
   color: #b5e1ffe0;
   text-shadow: 0 0 2px #004576, 0 0 10px #6fc4fde0, 0 0 10px #6fc4fde0;
   letter-spacing: 1px;
+}
+.help-button {
+  font-size: 0.9rem;
+  padding: 0px 10px;
+  background: #eeeeee00;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .chart-wrapper {
@@ -45,9 +59,9 @@ body,
   bottom: 10px;
 
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.429);
+  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(6px);
-  border: 2px solid rgba(135, 135, 135, 0.338);
+  border: 2px solid rgba(135, 135, 135, 0.178);
 
   padding: 20px;
   box-sizing: border-box;
@@ -67,15 +81,16 @@ table th,
 table td {
   border: 1px solid rgb(0, 93, 155); /* ← 中の線だけ太くなる */
 }
+
 /* 上のタイプ（防御） */
 table thead th {
-  background-color: #cde6ff;
+  background-color: #7e92a8;
   font-weight: bold;
 }
 
 /* 左のタイプ（攻撃） */
 table tbody th {
-  background-color: #cde6ff;
+  background-color: #7e92a8;
   font-weight: bold;
 }
 
@@ -204,4 +219,24 @@ table tr:nth-child(18) {
   flex-direction: row; /* ← 横並びにする */
   align-items: center; /* ← 縦位置を揃える */
   gap: 10px; /* ← ラベルとselectの間の余白 */
+}
+
+@media (prefers-color-scheme: light) {
+  .back {
+    background-image: url("/image/sq2.png");
+  }
+  .app-wrapper {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  /* 上のタイプ（防御） */
+  table thead th {
+    background-color: #cde6ff;
+    font-weight: bold;
+  }
+
+  /* 左のタイプ（攻撃） */
+  table tbody th {
+    background-color: #cde6ff;
+    font-weight: bold;
+  }
 }
