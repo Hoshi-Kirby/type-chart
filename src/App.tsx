@@ -6,6 +6,7 @@ import { TypeChartTable } from "./TypeChart";
 import { DualTypeChartTable } from "./DualTypeChart";
 import { CoverTypeChartTable } from "./CoverTypeChart";
 import { ResistTypeChartTable } from "./ResistTypeChart";
+import { ConditionTypeChartTable } from "./ConditionTypeChart";
 import type { TypeName } from "./value";
 
 type Gen = "gen1" | "gen2" | "gen3" | "gen4";
@@ -36,8 +37,8 @@ const atkTypesByGen: Record<Gen, TypeName[]> = {
     "普",
     "炎",
     "水",
-    "草",
     "電",
+    "草",
     "氷",
     "闘",
     "毒",
@@ -52,8 +53,8 @@ const atkTypesByGen: Record<Gen, TypeName[]> = {
     "普",
     "炎",
     "水",
-    "草",
     "電",
+    "草",
     "氷",
     "闘",
     "毒",
@@ -71,8 +72,8 @@ const atkTypesByGen: Record<Gen, TypeName[]> = {
     "普",
     "炎",
     "水",
-    "草",
     "電",
+    "草",
     "氷",
     "闘",
     "毒",
@@ -92,8 +93,8 @@ const atkTypesByGen: Record<Gen, TypeName[]> = {
     "普",
     "炎",
     "水",
-    "草",
     "電",
+    "草",
     "氷",
     "闘",
     "毒",
@@ -217,6 +218,9 @@ export default function App() {
     "-",
     "-",
   ]);
+  const [atkTypesC, setAtkTypesC] = useState<TypeName[]>(["-", "-", "-", "-"]);
+  const [atkMagniC, setAtkMagniC] = useState<number[]>([1, 1, 1, 1]);
+  const [atkSizeC, setAtkSizeC] = useState<(-1 | 0 | 1)[]>([0, 0, 0, 0]);
 
   // 特性
   const [abilities, setAbilities] = useState({
@@ -330,6 +334,7 @@ export default function App() {
               <option value="dual">対複合相性</option>
               <option value="cover">技範囲</option>
               <option value="resist">複合耐性</option>
+              <option value="condition">相性条件</option>
             </select>
           </div>
           {mode === "single" && (
@@ -515,6 +520,141 @@ export default function App() {
                   <span className="x05">△</span>:×0.5　
                   <span className="x025">⟁</span>
                   :×0.25　<span className="x0">×</span>:×0
+                </div>
+              </div>
+            </>
+          )}
+          {mode === "condition" && (
+            <>
+              <div style={{ width: "100%" }}>
+                <div className="cover-types">
+                  <h3>攻撃タイプ</h3>
+
+                  <div>
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="atk-item">
+                        <p>技 {i + 1}</p>
+
+                        {/* タイプ選択 */}
+                        <select
+                          value={atkTypesC[i]}
+                          onChange={(e) => {
+                            const newArr = [...atkTypesC];
+                            newArr[i] = e.target.value as TypeName;
+
+                            setAtkTypesC(newArr);
+                          }}
+                        >
+                          {" "}
+                          <option value="-">-</option>
+                          {/* 通常タイプ */}
+                          {atkTypesByGen[gen].map((type) => (
+                            <option key={type} value={type}>
+                              {typeLabels[type]}
+                            </option>
+                          ))}
+                          {/* 特殊技 */}
+                          {(gen === "gen3" || gen === "gen4") && (
+                            <>
+                              <option value="1">フリーズドライ</option>
+                              <option value="2">フライングプレス</option>
+
+                              {gen === "gen3" && (
+                                <>
+                                  <option value="3">サウザンアロー</option>
+                                  <option value="4">無に帰す光</option>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </select>
+
+                        {/* 二連セレクト（倍率 × 条件） */}
+                        <div className="dual-select">
+                          {/* 倍率 */}
+                          <select
+                            value={atkMagniC[i]}
+                            onChange={(e) => {
+                              const newArr = [...atkMagniC];
+                              newArr[i] = Number(e.target.value);
+                              setAtkMagniC(newArr);
+                            }}
+                          >
+                            <option value={0}>無効</option>
+                            <option value={0.25}>1/4倍</option>
+                            <option value={0.5}>半減</option>
+                            <option value={1}>等倍</option>
+                            <option value={2}>弱点</option>
+                            <option value={4}>4倍</option>
+                          </select>
+
+                          {/* 条件 */}
+                          <select
+                            value={atkSizeC[i]}
+                            onChange={(e) => {
+                              const newArr = [...atkSizeC];
+                              newArr[i] = Number(e.target.value) as -1 | 0 | 1;
+
+                              setAtkSizeC(newArr);
+                            }}
+                          >
+                            <option value={0}>-</option>
+                            <option value={-1}>以下</option>
+                            <option value={1}>以上</option>
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {(gen === "gen2" || gen === "gen3" || gen === "gen4") && (
+                  <>
+                    <h3>特性</h3>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={abilities.gutsy}
+                        onChange={(e) =>
+                          setAbilities({
+                            ...abilities,
+                            gutsy: e.target.checked,
+                          })
+                        }
+                      />
+                      肝っ玉/心眼
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={abilities.levitate}
+                        onChange={(e) =>
+                          setAbilities({
+                            ...abilities,
+                            levitate: e.target.checked,
+                          })
+                        }
+                      />
+                      相手の特性を考慮
+                    </label>
+                  </>
+                )}
+              </div>
+              <div className="chart-wrapper">
+                {chartForGen && (
+                  <ConditionTypeChartTable
+                    atkTypesC={atkTypesC}
+                    atkMagniC={atkMagniC}
+                    atkSizeC={atkSizeC}
+                    chart={chartForGen}
+                    gen={gen}
+                    gutsy={abilities.gutsy}
+                    levitate={abilities.levitate}
+                  />
+                )}
+
+                <div className="mark">
+                  <span className="x2">○</span>:×2　 :×0.25　
+                  <span className="x0">×</span>:×0
                 </div>
               </div>
             </>

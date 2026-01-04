@@ -16,7 +16,9 @@ type TypeChart = {
 type Gen = "gen1" | "gen2" | "gen3" | "gen4";
 
 type Props = {
-  atkTypes: AttackType[]; // ← 6つの攻撃タイプ
+  atkTypesC: AttackType[];
+  atkMagniC: number[];
+  atkSizeC: (-1 | 0 | 1)[];
   chart: TypeChart;
   gen: Gen;
   gutsy: boolean;
@@ -102,8 +104,10 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
   ],
 };
 
-export const CoverTypeChartTable: React.FC<Props> = ({
-  atkTypes,
+export const ConditionTypeChartTable: React.FC<Props> = ({
+  atkTypesC,
+  atkMagniC,
+  atkSizeC,
   chart,
   gen,
   gutsy,
@@ -130,20 +134,12 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     if (eff === 0) return 2;
     return 1; // 1倍はそのまま
   }
-  function toSymbol(eff: number): string {
-    if (eff === 4) return "◎";
-    if (eff === 2) return "○";
-    if (eff === 0.5) return "△";
-    if (eff === 0.25) return "⟁";
-    if (eff === 0) return "×";
+  function toSymbol(ok: boolean): string {
+    if (ok === true) return "●";
     return "";
   }
-  function getClassName(eff: number): string {
-    if (eff === 4) return "eff-super2";
-    if (eff === 2) return "eff-super";
-    if (eff === 0.5) return "eff-notvery";
-    if (eff === 0.25) return "eff-notvery2";
-    if (eff === 0) return "eff-immune";
+  function getClassName(ok: boolean): string {
+    if (ok === true) return "eff-super";
     return "eff-normal";
   }
 
@@ -181,12 +177,12 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     if (!list) return false;
 
     return list.some((pair) => {
-      // 単タイプ（pair = ["炎"]）
+      // 単タイプ
       if (pair.length === 1) {
         return pair[0] === type1 && type1 === type2;
       }
 
-      // 複合タイプ（pair = ["炎","電"]）
+      // 複合タイプ
       if (pair.length === 2) {
         return (
           (pair[0] === type1 && pair[1] === type2) ||
@@ -197,19 +193,24 @@ export const CoverTypeChartTable: React.FC<Props> = ({
       return false;
     });
   }
-  function getWorstEffForAbility(
-    abilityName: string,
-    atkTypes: AttackType[],
+  function checkAllConditions(
+    atkTypesC: AttackType[],
+    atkMagniC: number[],
+    atkSizeC: (-1 | 0 | 1)[],
     type1: TypeName,
     type2: TypeName,
     chart: TypeChart,
     gen: Gen,
     gutsy: boolean,
+    abilityName: string,
     abilityForGen: Record<string, string[][]>
-  ): number {
-    let maxEff = 0;
+  ) {
+    let result = 1;
 
-    for (const atk of atkTypes) {
+    for (let i = 0; i < 4; i++) {
+      const atk = atkTypesC[i];
+      if (atk === "-") continue; // 技未設定ならスキップ
+
       const eff = calcEff(
         atk,
         type1,
@@ -220,13 +221,29 @@ export const CoverTypeChartTable: React.FC<Props> = ({
         abilityName,
         abilityForGen
       );
-      if (eff > maxEff) maxEff = eff;
+
+      const target = atkMagniC[i]; // 0, 0.25, 0.5, 1, 2, 4
+      const cond = atkSizeC[i]; // -1, 0, 1
+
+      let ok = false;
+
+      if (cond === 0) ok = eff === target;
+      if (cond === -1) ok = eff <= target;
+      if (cond === 1) ok = eff >= target;
+
+      if (!ok) {
+        result = 0;
+        break;
+      }
     }
 
-    return maxEff;
+    return result;
   }
-  function getBestAbilityEff(
-    atkTypes: AttackType[],
+
+  function getAbilitiesThatMeetConditions(
+    atkTypesC: AttackType[],
+    atkMagniC: number[],
+    atkSizeC: (-1 | 0 | 1)[],
     type1: TypeName,
     type2: TypeName,
     chart: TypeChart,
@@ -234,46 +251,60 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     gutsy: boolean,
     levitate: boolean,
     abilityForGen: Record<string, string[][]>
-  ): { eff: number; abilities: string[] } {
+  ): { ok: boolean; abilities: string[] } {
     const abilityNames = Object.keys(abilityForGen);
 
-    // 特性なし
-    let firstEff = getWorstEffForAbility(
-      "",
-      atkTypes,
+    // 特性なし（""）で判定
+    const baseOk = checkAllConditions(
+      atkTypesC,
+      atkMagniC,
+      atkSizeC,
       type1,
       type2,
       chart,
       gen,
       gutsy,
+      "",
       abilityForGen
     );
-    let bestEff = firstEff;
-    let betterAbilities: string[] = [];
 
-    // 各特性
-    if (levitate) {
+    let okAbilities: string[] = [];
+
+    // 各特性で判定
+    if (levitate === true) {
       for (const ability of abilityNames) {
-        const eff = getWorstEffForAbility(
-          ability,
-          atkTypes,
+        const ok = checkAllConditions(
+          atkTypesC,
+          atkMagniC,
+          atkSizeC,
           type1,
           type2,
           chart,
           gen,
           gutsy,
+          ability,
           abilityForGen
         );
 
-        if (eff < firstEff) betterAbilities.push(ability);
-        if (eff < bestEff) bestEff = eff;
+        // 特性なしでは満たさないが、この特性では満たす
+        if (baseOk === 0 && ok === 1) {
+          okAbilities.push(ability);
+        }
       }
     }
-    if (bestEff === firstEff) {
-      return { eff: bestEff, abilities: [] };
+
+    // 特性なしで満たす場合
+    if (baseOk === 1) {
+      return { ok: true, abilities: [] };
     }
 
-    return { eff: bestEff, abilities: betterAbilities };
+    // 特性ありでのみ満たす場合
+    if (okAbilities.length > 0) {
+      return { ok: true, abilities: okAbilities };
+    }
+
+    // どの特性でも満たさない
+    return { ok: false, abilities: [] };
   }
 
   function calcEff(
@@ -607,8 +638,10 @@ export const CoverTypeChartTable: React.FC<Props> = ({
             <th>{type1}</th>
 
             {types.map((type2, colIndex) => {
-              const { eff, abilities } = getBestAbilityEff(
-                atkTypes,
+              const { ok, abilities } = getAbilitiesThatMeetConditions(
+                atkTypesC,
+                atkMagniC,
+                atkSizeC,
                 type1,
                 type2,
                 chart,
@@ -631,7 +664,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
                   }}
                   className={[
                     abilities.length > 0 ? "everyday" : "",
-                    getClassName(eff),
+                    getClassName(ok),
                     hoverRow === rowIndex ? "hover-row" : "",
                     hoverCol === colIndex ? "hover-col" : "",
                     hoverRow === rowIndex && hoverCol === colIndex
@@ -641,7 +674,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
                   ].join(" ")}
                 >
                   <div className="squ">
-                    {toSymbol(eff)}
+                    {toSymbol(ok)}
 
                     {hoverRow === rowIndex &&
                     hoverCol === colIndex &&
