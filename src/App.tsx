@@ -189,6 +189,7 @@ const defTypesByGen: Record<Gen, TypeName[]> = {
 };
 export default function App() {
   const [help, setHelp] = useState<boolean>(false);
+  const [helpPage, setHelpPage] = useState<number>(1);
   const [allCharts, setAllCharts] = useState<any>({});
   const [gen, setGen] = useState<Gen>("gen3");
   const chartForGen = gen === "gen4" ? allCharts["gen3"] : allCharts[gen];
@@ -220,14 +221,6 @@ export default function App() {
   // 特性
   const [abilities, setAbilities] = useState({
     levitate: false,
-    waterAbsorb: false,
-    thickFat: false,
-    lightningRod: false,
-    flashFire: false,
-    sapSipper: false,
-    suihou: false,
-    tainetu: false,
-    kiyome: false,
     gutsy: false, // 肝っ玉
   });
 
@@ -252,7 +245,68 @@ export default function App() {
                 使い方∧
               </button>
               <div>
-                <div>あいうえお</div>
+                <div className="header">
+                  <button
+                    className="help-button"
+                    onClick={() => setHelpPage(helpPage > 1 ? helpPage - 1 : 1)}
+                  >
+                    ＜
+                  </button>
+                  <p>{helpPage}/5</p>
+                  <button
+                    className="help-button"
+                    onClick={() => setHelpPage(helpPage < 5 ? helpPage + 1 : 5)}
+                  >
+                    ＞
+                  </button>
+                </div>
+                {helpPage === 1 ? (
+                  <>
+                    <h4>このサイトについて</h4>
+                    <div>
+                      このサイトは全世代、複合タイプ対応のタイプ相性表です。
+                    </div>
+                    <div>また、四つの技の技範囲を見ることもできます。</div>
+                  </>
+                ) : helpPage === 2 ? (
+                  <>
+                    <h4>タイプ相性</h4>
+                    <div>よく見るタイプ相性表です。</div>
+                  </>
+                ) : helpPage === 3 ? (
+                  <>
+                    <h4>対複合相性</h4>
+                    <div>複合タイプのタイプ相性表です。</div>
+                    <div className="hr">
+                      攻撃するタイプを選択すると、複合タイプに対する相性を見ることができます。
+                    </div>
+                  </>
+                ) : helpPage === 4 ? (
+                  <>
+                    <h4>技範囲</h4>
+                    <div className="hr">
+                      攻撃するタイプを複数入力して、それぞれの複合タイプに対して最善の技を打った場合の相性が表示されます。
+                    </div>
+                    <div className="hr">
+                      テラバーストやウェザーボールなどの一つのタイプで二タイプ使える技は、「例外」の欄を利用してください。
+                    </div>
+                    <div className="hr">
+                      相手の特性を考慮する場合、相手の特性によって最善の相性が変化する可能性がある複合タイプを赤色で示します。
+                    </div>
+                    <div className="hr">
+                      また、その特性はタップまたはマウスオーバーすることで見ることができます。
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4>複合耐性</h4>
+                    <div className="hr">
+                      選択した複合タイプに対する全タイプの相性を見ることができます。
+                    </div>
+                    <div className="hr">六匹同時に見ることができます。</div>
+                  </>
+                )}
+                <hr className="hr"></hr>
               </div>
             </>
           )}
