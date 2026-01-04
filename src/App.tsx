@@ -259,7 +259,7 @@ export default function App() {
                   <p>{helpPage}/6</p>
                   <button
                     className="help-button"
-                    onClick={() => setHelpPage(helpPage < 6 ? helpPage + 1 : 6)}
+                    onClick={() => setHelpPage(helpPage < 7 ? helpPage + 1 : 7)}
                   >
                     ＞
                   </button>
