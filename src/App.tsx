@@ -256,10 +256,10 @@ export default function App() {
                   >
                     ＜
                   </button>
-                  <p>{helpPage}/5</p>
+                  <p>{helpPage}/6</p>
                   <button
                     className="help-button"
-                    onClick={() => setHelpPage(helpPage < 5 ? helpPage + 1 : 5)}
+                    onClick={() => setHelpPage(helpPage < 6 ? helpPage + 1 : 6)}
                   >
                     ＞
                   </button>
@@ -304,13 +304,42 @@ export default function App() {
                       また、その特性はタップまたはマウスオーバーすることで見ることができます。
                     </div>
                   </>
-                ) : (
+                ) : helpPage === 5 ? (
                   <>
                     <h4>モード：複合耐性</h4>
                     <div className="hr">
                       選択した複合タイプに対する全タイプの相性を見ることができます。
                     </div>
                     <div className="hr">六匹同時に見ることができます。</div>
+                  </>
+                ) : helpPage === 6 ? (
+                  <>
+                    <h4>モード：相性条件</h4>
+                    <div className="hr">
+                      四つの技のタイプと相性の条件を入力すると、その条件をすべて満たす複合タイプを調べることができます。
+                    </div>
+                    <div className="hr">
+                      相手の特性を考慮する場合、相手の特性によって条件を満たすことのできる複合タイプを赤色で示します。
+                    </div>
+                    <div className="hr">
+                      また、その特性はタップまたはマウスオーバーすることで見ることができます。
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4>相手の特性を考慮　について</h4>
+                    <div className="hr">
+                      相手の特性を考慮するときの特性は、攻撃技のタイプによってダメージを軽減あるいは無効にする特性のみ考慮しています。
+                    </div>
+                    <div className="hr">
+                      また、それぞれの世代においてある特性を持ったポケモンが存在しないタイプではその特性は考慮しません。
+                    </div>
+                    <div className="hr">
+                      考慮する特性は、ふゆう、どしょく、ちくでん、ひらいしん、でんきエンジン、ちょすい、よびみず、もらいび、こんがりボディ、そうしょく、あついしぼう、かんそうはだ、たいねつ、きよめのしお、すいほうです。
+                    </div>
+                    <div className="hr">
+                      かんそうはだへの炎技は1.25倍で計算していますが、かんそうはだへの炎技がかんそうはだではない同じタイプへの水技よりも低い倍率になるポケモンがZA以前に存在しないため、相性表の記号に影響はありません。
+                    </div>
                   </>
                 )}
                 <hr className="hr"></hr>
@@ -653,8 +682,7 @@ export default function App() {
                 )}
 
                 <div className="mark">
-                  <span className="x2">○</span>:×2　 :×0.25　
-                  <span className="x0">×</span>:×0
+                  <span className="x4">●</span>:ok
                 </div>
               </div>
             </>
