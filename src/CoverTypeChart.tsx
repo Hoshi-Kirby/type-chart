@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import "./CoverTypeChart.css";
+import "./TypeChart.css";
 import React from "react";
 import type { TypeName } from "./value";
 import type { SpecialMove } from "./value";

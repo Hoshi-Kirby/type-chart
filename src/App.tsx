@@ -335,6 +335,13 @@ export default function App() {
           {mode === "single" && (
             <div className="chart-wrapper">
               {chartForGen && <TypeChartTable chart={chartForGen} gen={gen} />}
+
+              <div className="mark">
+                <span className="x2">○</span>
+                :×2　
+                <span className="x05">△</span>:×0.5　
+                <span className="x0">×</span>:×0
+              </div>
             </div>
           )}
           {mode === "dual" && (
@@ -360,6 +367,14 @@ export default function App() {
                     gen={gen}
                   />
                 )}
+
+                <div className="mark">
+                  <span className="x4">◎</span>:×4　
+                  <span className="x2">○</span>:×2　
+                  <span className="x05">△</span>:×0.5　
+                  <span className="x025">⟁</span>
+                  :×0.25　<span className="x0">×</span>:×0
+                </div>
               </div>
             </>
           )}
@@ -446,6 +461,14 @@ export default function App() {
                     levitate={abilities.levitate}
                   />
                 )}
+
+                <div className="mark">
+                  <span className="x4">◎</span>:×4　
+                  <span className="x2">○</span>:×2　
+                  <span className="x05">△</span>:×0.5　
+                  <span className="x025">⟁</span>
+                  :×0.25　<span className="x0">×</span>:×0
+                </div>
               </div>
             </>
           )}
@@ -485,6 +508,14 @@ export default function App() {
                     gen={gen}
                   />
                 )}
+
+                <div className="mark">
+                  <span className="x4">◎</span>:×4　
+                  <span className="x2">○</span>:×2　
+                  <span className="x05">△</span>:×0.5　
+                  <span className="x025">⟁</span>
+                  :×0.25　<span className="x0">×</span>:×0
+                </div>
               </div>
             </>
           )}

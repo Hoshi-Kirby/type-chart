@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./DualTypeChart.css";
+import "./TypeChart.css";
 import React from "react";
 import type { TypeName } from "./value";
 
