@@ -218,6 +218,12 @@ export default function App() {
     "-",
     "-",
   ]);
+  const [andOr, setAndOr] = useState<string>("aaa");
+  const [text, setText] = useState<string>("1⋂2⋂3⋂4");
+  const [cursor, setCursor] = useState<number>(0);
+  const [currentInput, setCurrentInput] = useState<string>("1⋂2⋂3⋂4");
+  const [editing, setEditing] = useState(true);
+
   const [atkTypesC, setAtkTypesC] = useState<TypeName[]>(["-", "-", "-", "-"]);
   const [atkMagniC, setAtkMagniC] = useState<number[]>([1, 1, 1, 1]);
   const [atkSizeC, setAtkSizeC] = useState<(-1 | 0 | 1)[]>([0, 0, 0, 0]);
@@ -233,6 +239,174 @@ export default function App() {
       .then((res) => res.json())
       .then((data) => setAllCharts(data));
   }, []);
+
+  //  キー
+  const leftChar = currentInput[cursor - 1];
+  const leftLeftChar = currentInput[cursor - 2];
+
+  function LogicDisplay({
+    currentInput,
+    cursor,
+  }: {
+    currentInput: string;
+    cursor: number;
+  }) {
+    const rendered = [];
+
+    rendered.push(<span key="g-start" className="gap"></span>);
+    for (let i = 0; i < currentInput.length; i++) {
+      const c = currentInput[i];
+
+      if (c >= "5" && c <= "8") {
+        const base = String(Number(c) - 4); // 5→1, 6→2...
+        rendered.push(<span className="not-mode">{base}</span>);
+      } else {
+        rendered.push(<span>{c}</span>);
+      }
+      // gap を入れる（カーソルがここに来る可能性がある）
+      rendered.push(<span key={`g-${i}`} className="gap"></span>);
+    }
+
+    // カーソルを表示位置に挿入
+    const cursorPos = cursor * 2; // 文字とgapが交互なので2倍
+    rendered[cursorPos] = (
+      <span key={`cursor-${cursor}`} className="cursor"></span>
+    );
+
+    return <div className="logic-display">{rendered}</div>;
+  }
+
+  function Key({
+    label,
+    wide,
+    className,
+    onClick,
+  }: {
+    label: string;
+    wide?: boolean;
+    className?: string;
+    onClick?: () => void;
+  }) {
+    return (
+      <button
+        className={`key ${wide ? "wide" : ""} ${className ?? ""}`}
+        onClick={onClick}
+      >
+        {label}
+      </button>
+    );
+  }
+  // 入力
+  function insertAtCursor(key: string) {
+    setCurrentInput((prev) => {
+      const left = prev.slice(0, cursor);
+      const right = prev.slice(cursor);
+      return left + key + right;
+    });
+    setCursor((c) => c + key.length);
+  }
+  // 削除
+  function backspace() {
+    if (cursor === 0) return; // ← 左に何もないので削除不可
+
+    setCurrentInput((prev) => {
+      const left = prev.slice(0, cursor - 1); // ← 1文字左を削除
+      const right = prev.slice(cursor);
+      return left + right;
+    });
+
+    setCursor((c) => c - 1); // ← カーソルを左へ
+  }
+  function replaceLeft(newChar: string) {
+    const pos = cursor - 1;
+
+    setCurrentInput(
+      currentInput.slice(0, pos) + newChar + currentInput.slice(pos + 1)
+    );
+
+    // カーソル位置はそのまま（1文字置換なのでズレない）
+    setCursor(pos + 1);
+  }
+  // 数字
+
+  function handleDigitClick(digit: string) {
+    const left = currentInput[cursor - 1];
+    const isNot = ["5", "6", "7", "8"].includes(left);
+
+    // NOT を外す
+    if (isNot) {
+      const original = String(Number(left) - 4); // 5→1, 6→2...
+      replaceLeft(original);
+      return;
+    }
+    // NOT を付ける
+    if (left === digit) {
+      const notVersion = String(Number(digit) + 4); // 1→5, 2→6...
+      replaceLeft(notVersion);
+      return;
+    }
+    // 通常挿入
+    insertAtCursor(digit);
+  }
+
+  // チェック
+  function isValidExpression(input: string): boolean {
+    // 許可される文字のみ
+    if (!/^[1-8⋂⋃()]*$/.test(input)) return false;
+
+    // トークン化（1文字ずつ）
+    const tokens = [...input];
+
+    // 括弧の深さ
+    let depth = 0;
+
+    // 前のトークンの種類
+    type Prev = "start" | "operand" | "operator" | "lparen" | "rparen";
+    let prev: Prev = "start";
+
+    const isOperand = (t: string) => /^[1-8]$/.test(t);
+    const isOperator = (t: string) => t === "⋂" || t === "⋃";
+
+    for (const t of tokens) {
+      if (isOperand(t)) {
+        // オペランドの前に来てよいのは start, operator, lparen
+        if (!(prev === "start" || prev === "operator" || prev === "lparen")) {
+          return false;
+        }
+        prev = "operand";
+      } else if (isOperator(t)) {
+        // 演算子の前に来てよいのは operand, rparen
+        if (!(prev === "operand" || prev === "rparen")) {
+          return false;
+        }
+        prev = "operator";
+      } else if (t === "(") {
+        // ( の前に来てよいのは start, operator, lparen
+        if (!(prev === "start" || prev === "operator" || prev === "lparen")) {
+          return false;
+        }
+        depth++;
+        prev = "lparen";
+      } else if (t === ")") {
+        // ) の前に来てよいのは operand, rparen
+        if (!(prev === "operand" || prev === "rparen")) {
+          return false;
+        }
+        depth--;
+        if (depth < 0) return false;
+        prev = "rparen";
+      }
+    }
+
+    // 括弧が閉じているか
+    if (depth !== 0) return false;
+
+    // 最後が operator で終わっていないか
+    if (prev === "operator" || prev === "lparen") return false;
+
+    return true;
+  }
+
   return (
     <>
       <div className="back"></div>
@@ -248,7 +422,7 @@ export default function App() {
               <button className="help-button" onClick={() => setHelp(false)}>
                 使い方∧
               </button>
-              <div>
+              <div className={`help-panel ${help ? "open" : ""}`}>
                 <div className="header">
                   <button
                     className="help-button"
@@ -295,7 +469,7 @@ export default function App() {
                       攻撃するタイプを複数入力して、それぞれの複合タイプに対して最善の技を打った場合の相性が表示されます。
                     </div>
                     <div className="hr">
-                      テラバーストやウェザーボールなどの一つのタイプで二タイプ使える技は、「例外」の欄を利用してください。
+                      テラバーストやウェザーボールなどの一つの技で二タイプ使える技は、「例外」の欄を利用してください。
                     </div>
                     <div className="hr">
                       相手の特性を考慮する場合、相手の特性によって最善の相性が変化する可能性がある複合タイプを赤色で示します。
@@ -556,6 +730,158 @@ export default function App() {
               <div style={{ width: "100%" }}>
                 <div className="cover-types">
                   <h3>攻撃タイプ</h3>
+                  <span>論理式</span>
+                  <select
+                    value={andOr}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      const label = e.target.selectedOptions[0].text; // ← 表示文字列
+
+                      setAndOr(v);
+
+                      if (v !== "custom") {
+                        setText(label);
+                        setCurrentInput(label);
+                      } else {
+                      }
+                    }}
+                    className="and-or"
+                  >
+                    <option value="aaa">1⋂2⋂3⋂4</option>
+                    <option value="ooo">1⋃2⋃3⋃4</option>
+                    <option value="o-aa">(1⋃2)⋂3⋂4</option>
+                    <option value="a-oo">(1⋂2)⋃3⋃4</option>
+                    <option value="oo-a">(1⋃2⋃3)⋂4</option>
+                    <option value="aa-o">(1⋂2⋂3)⋃4</option>
+                    <option value="o-ao">(1⋃2)⋂(3⋃4)</option>
+                    <option value="a-oa">(1⋂2)⋃(3⋂4)</option>
+                    <option value="a-o-a">((1⋂2)⋃3)⋂4</option>
+                    <option value="o-a-o">((1⋃2)⋂3)⋃4</option>
+                    <option value="custom">入力する...</option>
+                  </select>
+                  {andOr === "custom" ? (
+                    <>
+                      {!editing && (
+                        <button
+                          className="compact-display"
+                          onClick={() => setEditing(true)}
+                        >
+                          <LogicDisplay
+                            currentInput={currentInput}
+                            cursor={-1}
+                          />
+                        </button>
+                      )}
+                      {editing && (
+                        <div className="logic-editor">
+                          {/* 入力欄（カーソル付き） */}
+                          <div className="display-box">
+                            <LogicDisplay
+                              currentInput={currentInput}
+                              cursor={cursor}
+                            />
+                          </div>
+
+                          {/* キーボード */}
+                          <div className="keyboard">
+                            <div className="row">
+                              <Key
+                                label="("
+                                onClick={() => insertAtCursor("(")}
+                              />
+                              <Key
+                                label=")"
+                                onClick={() => insertAtCursor(")")}
+                              />
+                              <Key
+                                label="⋂"
+                                onClick={() => insertAtCursor("⋂")}
+                              />
+                              <Key
+                                label="⋃"
+                                onClick={() => insertAtCursor("⋃")}
+                              />
+                              <Key
+                                label="1"
+                                className={
+                                  leftChar === "1" && leftLeftChar !== "¬"
+                                    ? "not-mode"
+                                    : ""
+                                }
+                                onClick={() => handleDigitClick("1")}
+                              />
+                              <Key
+                                label="2"
+                                className={
+                                  leftChar === "2" && leftLeftChar !== "¬"
+                                    ? "not-mode"
+                                    : ""
+                                }
+                                onClick={() => handleDigitClick("2")}
+                              />
+                              <Key
+                                label="3"
+                                className={
+                                  leftChar === "3" && leftLeftChar !== "¬"
+                                    ? "not-mode"
+                                    : ""
+                                }
+                                onClick={() => handleDigitClick("3")}
+                              />
+                              <Key
+                                label="4"
+                                className={
+                                  leftChar === "4" && leftLeftChar !== "¬"
+                                    ? "not-mode"
+                                    : ""
+                                }
+                                onClick={() => handleDigitClick("4")}
+                              />
+                            </div>
+
+                            <div className="row">
+                              <Key
+                                label="←"
+                                onClick={() =>
+                                  setCursor(Math.max(0, cursor - 1))
+                                }
+                              />
+                              <Key
+                                label="→"
+                                onClick={() =>
+                                  setCursor(
+                                    Math.min(currentInput.length, cursor + 1)
+                                  )
+                                }
+                              />
+                              <Key label="⌫" onClick={backspace} />
+                              <Key
+                                label="クリア"
+                                wide
+                                onClick={() => {
+                                  setCurrentInput("");
+                                  setCursor(0);
+                                }}
+                              />
+                              <Key
+                                label="決定"
+                                wide
+                                className="decision"
+                                onClick={() => {
+                                  if (isValidExpression(currentInput)) {
+                                    setText(currentInput);
+                                    setEditing(false);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <></>
+                  )}
 
                   <div>
                     {[0, 1, 2, 3].map((i) => (
@@ -676,11 +1002,12 @@ export default function App() {
                     gen={gen}
                     gutsy={abilities.gutsy}
                     levitate={abilities.levitate}
+                    text={text}
                   />
                 )}
 
                 <div className="mark">
-                  <span className="x4">●</span>:ok
+                  <span className="x2">●</span>:ok
                 </div>
               </div>
             </>

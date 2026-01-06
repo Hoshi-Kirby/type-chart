@@ -38,9 +38,38 @@ body,
   padding: 0px 10px;
   background: #eeeeee00;
   color: #ffffff;
-  border: none;
+  border-color: rgba(0, 0, 0, 0);
   border-radius: 6px;
   cursor: pointer;
+}
+.help-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 開いたとき */
+.help-panel.open {
+  max-height: 1000px; /* 中身より大きければOK */
+  opacity: 1;
+  transform: translateY(0);
+}
+.and-or {
+  font-size: 0.9rem;
+  padding: 0px 10px;
+  background: #eeeeee00;
+  color: #ffffff;
+  border-color: rgba(0, 0, 0, 0);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.and-or option {
+  background: #222;
+}
+.and-or:hover {
+  border-color: rgba(0, 0, 0, 0.5);
 }
 .hr {
   width: 360px;
@@ -263,6 +292,102 @@ table tr:nth-child(18) {
   border-left: 1px solid #888;
 }
 
+.compact-display {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  min-height: 15px; /* セレクトボックスと同じ高さ */
+  max-width: min(60vw, 240px);
+  border: 1px solid #7c7c7c;
+  border-radius: 0px;
+  background: #383838;
+  cursor: pointer;
+  font-size: 10px;
+  color: #ffffff;
+  max-width: 130px; /* ← 好きな最大幅にする */
+
+  white-space: nowrap; /* 1行にする */
+  overflow: hidden; /* はみ出しを隠す */
+  text-overflow: ellipsis; /* … にする */
+}
+
+.logic-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.display-box {
+  border: 1px solid #aaa;
+  padding: 6px;
+  min-height: 20px;
+  font-size: 15px;
+  background: #141414;
+}
+
+.logic-display {
+  font-family: monospace;
+  white-space: pre;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: #e7e7e7;
+  animation: blink 1s steps(1, end) infinite;
+  animation-fill-mode: backwards;
+  opacity: 1;
+}
+.gap {
+  display: inline-block;
+  width: 2px; /* カーソルと同じ幅 */
+  height: 1.2em;
+  background: transparent;
+}
+.not-mode {
+  text-decoration: overline;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  gap: 4px;
+}
+
+.key {
+  flex: 1;
+  padding: 6px 0; /* ← 小さく */
+  font-size: 15px; /* ← 小さく */
+  background: #141414;
+  border: 1px solid #6d6d6d;
+  border-radius: 4px; /* ← 小さく */
+}
+
+.key.wide {
+  flex: 2;
+}
+
+.key.wide {
+  flex: 2;
+}
+.key.decision {
+  background: #3f5b63;
+  border-color: #5892be;
+  font-weight: bold;
+}
 @media (prefers-color-scheme: light) {
   .back {
     background-image: url("/image/sq2.png");
@@ -272,6 +397,12 @@ table tr:nth-child(18) {
   }
   .help-button {
     color: #000000;
+  }
+  .and-or {
+    color: #000000;
+  }
+  .and-or option {
+    background: #ffffff; /* ← 選択肢の背景も黒 */
   }
   /* 上のタイプ（防御） */
   table thead th {
@@ -283,6 +414,25 @@ table tr:nth-child(18) {
   table tbody th {
     background-color: #cde6ff;
     font-weight: bold;
+  }
+  .compact-display {
+    background: #fff;
+    color: #000000;
+  }
+  .display-box {
+    border: 1px solid #aaa;
+    background: #fff;
+  }
+  .cursor {
+    background: #333;
+  }
+  .key {
+    background: #f5f5f5;
+    border: 1px solid #aaa;
+  }
+  .key.decision {
+    background: #d0f0ff;
+    border-color: #5892be;
   }
 }
 

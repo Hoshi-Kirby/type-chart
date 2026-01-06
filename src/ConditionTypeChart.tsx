@@ -23,6 +23,7 @@ type Props = {
   gen: Gen;
   gutsy: boolean;
   levitate: boolean;
+  text: string;
 };
 
 const defTypesByGen: Record<Gen, TypeName[]> = {
@@ -112,6 +113,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
   gen,
   gutsy,
   levitate,
+  text,
 }) => {
   const types = defTypesByGen[gen];
   const [hoverRow, setHoverRow] = useState<number | null>(null);
@@ -193,7 +195,22 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       return false;
     });
   }
-  function checkAllConditions(
+  function convertExpression(text: string): string {
+    // 5〜8 → !1〜!4
+    const replacedNumbers = text
+      .replace(/5/g, "!1")
+      .replace(/6/g, "!2")
+      .replace(/7/g, "!3")
+      .replace(/8/g, "!4");
+
+    // ⋂ → &&, ⋃ → ||
+    const replacedOperators = replacedNumbers
+      .replace(/⋂/g, "&&")
+      .replace(/⋃/g, "||");
+
+    return replacedOperators;
+  }
+  function checkAllConditionsRaw(
     atkTypesC: AttackType[],
     atkMagniC: number[],
     atkSizeC: (-1 | 0 | 1)[],
@@ -204,12 +221,15 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     gutsy: boolean,
     abilityName: string,
     abilityForGen: Record<string, string[][]>
-  ) {
-    let result = 1;
+  ): boolean[] {
+    const okList: boolean[] = [];
 
     for (let i = 0; i < 4; i++) {
       const atk = atkTypesC[i];
-      if (atk === "-") continue; // 技未設定ならスキップ
+      if (atk === "-") {
+        okList.push(true); // 未設定は true 扱いにするならここ
+        continue;
+      }
 
       const eff = calcEff(
         atk,
@@ -222,22 +242,59 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
         abilityForGen
       );
 
-      const target = atkMagniC[i]; // 0, 0.25, 0.5, 1, 2, 4
-      const cond = atkSizeC[i]; // -1, 0, 1
+      const target = atkMagniC[i];
+      const cond = atkSizeC[i];
 
       let ok = false;
-
       if (cond === 0) ok = eff === target;
       if (cond === -1) ok = eff <= target;
       if (cond === 1) ok = eff >= target;
 
-      if (!ok) {
-        result = 0;
-        break;
-      }
+      okList.push(ok);
     }
 
-    return result;
+    return okList;
+  }
+  function evalLogicExpression(expr: string, okList: boolean[]): boolean {
+    // 1〜4 を okList の値に置き換える
+    let replaced = expr.replace(/[1-4]/g, (m) => {
+      const index = Number(m) - 1;
+      return okList[index] ? "true" : "false";
+    });
+
+    // JavaScript の論理式として評価
+    return Function(`return (${replaced});`)();
+  }
+  function checkAllConditions(
+    atkTypesC: AttackType[],
+    atkMagniC: number[],
+    atkSizeC: (-1 | 0 | 1)[],
+    type1: TypeName,
+    type2: TypeName,
+    chart: TypeChart,
+    gen: Gen,
+    gutsy: boolean,
+    abilityName: string,
+    abilityForGen: Record<string, string[][]>,
+    text: string
+  ) {
+    const okList = checkAllConditionsRaw(
+      atkTypesC,
+      atkMagniC,
+      atkSizeC,
+      type1,
+      type2,
+      chart,
+      gen,
+      gutsy,
+      abilityName,
+      abilityForGen
+    );
+
+    const jsExpr = convertExpression(text); // さっき作った変換関数
+    const result = evalLogicExpression(jsExpr, okList);
+
+    return result ? 1 : 0;
   }
 
   function getAbilitiesThatMeetConditions(
@@ -265,7 +322,8 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       gen,
       gutsy,
       "",
-      abilityForGen
+      abilityForGen,
+      text
     );
 
     let okAbilities: string[] = [];
@@ -283,7 +341,8 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
           gen,
           gutsy,
           ability,
-          abilityForGen
+          abilityForGen,
+          text
         );
 
         // 特性なしでは満たさないが、この特性では満たす
