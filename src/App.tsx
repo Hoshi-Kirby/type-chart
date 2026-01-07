@@ -223,6 +223,7 @@ export default function App() {
   const [cursor, setCursor] = useState<number>(0);
   const [currentInput, setCurrentInput] = useState<string>("1⋂2⋂3⋂4");
   const [editing, setEditing] = useState(true);
+  const [showError, setShowError] = useState(false);
 
   const [atkTypesC, setAtkTypesC] = useState<TypeName[]>(["-", "-", "-", "-"]);
   const [atkMagniC, setAtkMagniC] = useState<number[]>([1, 1, 1, 1]);
@@ -242,27 +243,38 @@ export default function App() {
 
   //  キー
   const leftChar = currentInput[cursor - 1];
-  const leftLeftChar = currentInput[cursor - 2];
 
   function LogicDisplay({
     currentInput,
     cursor,
+    showError,
   }: {
     currentInput: string;
     cursor: number;
+    showError: boolean;
   }) {
     const rendered = [];
+    const errorPositions = showError
+      ? getErrorPositions(currentInput)
+      : new Set<number>();
 
     rendered.push(<span key="g-start" className="gap"></span>);
     for (let i = 0; i < currentInput.length; i++) {
       const c = currentInput[i];
+      const isError = errorPositions.has(i);
 
-      if (c >= "5" && c <= "8") {
-        const base = String(Number(c) - 4); // 5→1, 6→2...
-        rendered.push(<span className="not-mode">{base}</span>);
-      } else {
-        rendered.push(<span>{c}</span>);
-      }
+      let className = "";
+      if (isError) className = "error-char";
+      if (c >= "5" && c <= "8") className += " not-mode";
+
+      const base = c >= "5" && c <= "8" ? String(Number(c) - 4) : c;
+
+      rendered.push(
+        <span key={`c-${i}`} className={className.trim()}>
+          {base}
+        </span>
+      );
+
       // gap を入れる（カーソルがここに来る可能性がある）
       rendered.push(<span key={`g-${i}`} className="gap"></span>);
     }
@@ -335,9 +347,11 @@ export default function App() {
 
     // NOT を外す
     if (isNot) {
-      const original = String(Number(left) - 4); // 5→1, 6→2...
-      replaceLeft(original);
-      return;
+      if (Number(left) === Number(digit) + 4) {
+        const original = String(Number(left) - 4); // 5→1, 6→2...
+        replaceLeft(original);
+        return;
+      }
     }
     // NOT を付ける
     if (left === digit) {
@@ -351,6 +365,7 @@ export default function App() {
 
   // チェック
   function isValidExpression(input: string): boolean {
+    if (input.trim() === "") return false;
     // 許可される文字のみ
     if (!/^[1-8⋂⋃()]*$/.test(input)) return false;
 
@@ -405,6 +420,59 @@ export default function App() {
     if (prev === "operator" || prev === "lparen") return false;
 
     return true;
+  }
+  // チェックナンバー
+  function getErrorPositions(input: string): Set<number> {
+    const error = new Set<number>();
+    const chars = [...input];
+
+    type Prev = "start" | "operand" | "operator" | "lparen" | "rparen";
+    let prev: Prev = "start";
+
+    const isOperand = (t: string) => /^[1-8]$/.test(t);
+    const isOperator = (t: string) => t === "⋂" || t === "⋃";
+
+    const stack: number[] = [];
+
+    chars.forEach((ch, i) => {
+      if (isOperand(ch)) {
+        if (!(prev === "start" || prev === "operator" || prev === "lparen")) {
+          error.add(i);
+        }
+        prev = "operand";
+      } else if (isOperator(ch)) {
+        if (!(prev === "operand" || prev === "rparen")) {
+          error.add(i);
+        }
+        prev = "operator";
+      } else if (ch === "(") {
+        if (!(prev === "start" || prev === "operator" || prev === "lparen")) {
+          error.add(i);
+        }
+        stack.push(i);
+        prev = "lparen";
+      } else if (ch === ")") {
+        if (!(prev === "operand" || prev === "rparen")) {
+          error.add(i);
+        }
+        if (stack.length === 0) {
+          error.add(i);
+        } else {
+          stack.pop();
+        }
+        prev = "rparen";
+      }
+    });
+
+    // 対応しなかった "(" を赤く
+    stack.forEach((pos) => error.add(pos));
+
+    // 演算子で終わっていたら最後の文字を赤く
+    if (["operator", "rparen"].includes(prev)) {
+      error.add(chars.length - 1);
+    }
+
+    return error;
   }
 
   return (
@@ -491,6 +559,9 @@ export default function App() {
                     <h4>モード：相性条件</h4>
                     <div className="hr">
                       四つの技のタイプと相性の条件を入力すると、その条件をすべて満たす複合タイプを調べることができます。
+                    </div>
+                    <div className="hr">
+                      条件式は変更することが出来て、自分で入力することもできます。また、notは数字キーをダブルクリックすることで使用できます。
                     </div>
                     <div className="hr">
                       相手の特性を考慮する場合、相手の特性によって条件を満たすことのできる複合タイプを赤色で示します。
@@ -769,6 +840,7 @@ export default function App() {
                           <LogicDisplay
                             currentInput={currentInput}
                             cursor={-1}
+                            showError={showError}
                           />
                         </button>
                       )}
@@ -779,6 +851,7 @@ export default function App() {
                             <LogicDisplay
                               currentInput={currentInput}
                               cursor={cursor}
+                              showError={showError}
                             />
                           </div>
 
@@ -787,55 +860,63 @@ export default function App() {
                             <div className="row">
                               <Key
                                 label="("
-                                onClick={() => insertAtCursor("(")}
+                                onClick={() => {
+                                  insertAtCursor("(");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label=")"
-                                onClick={() => insertAtCursor(")")}
+                                onClick={() => {
+                                  insertAtCursor(")");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="⋂"
-                                onClick={() => insertAtCursor("⋂")}
+                                onClick={() => {
+                                  insertAtCursor("⋂");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="⋃"
-                                onClick={() => insertAtCursor("⋃")}
+                                onClick={() => {
+                                  insertAtCursor("⋃");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="1"
-                                className={
-                                  leftChar === "1" && leftLeftChar !== "¬"
-                                    ? "not-mode"
-                                    : ""
-                                }
-                                onClick={() => handleDigitClick("1")}
+                                className={leftChar === "1" ? "not-mode" : ""}
+                                onClick={() => {
+                                  handleDigitClick("1");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="2"
-                                className={
-                                  leftChar === "2" && leftLeftChar !== "¬"
-                                    ? "not-mode"
-                                    : ""
-                                }
-                                onClick={() => handleDigitClick("2")}
+                                className={leftChar === "2" ? "not-mode" : ""}
+                                onClick={() => {
+                                  handleDigitClick("2");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="3"
-                                className={
-                                  leftChar === "3" && leftLeftChar !== "¬"
-                                    ? "not-mode"
-                                    : ""
-                                }
-                                onClick={() => handleDigitClick("3")}
+                                className={leftChar === "3" ? "not-mode" : ""}
+                                onClick={() => {
+                                  handleDigitClick("3");
+                                  setShowError(false);
+                                }}
                               />
                               <Key
                                 label="4"
-                                className={
-                                  leftChar === "4" && leftLeftChar !== "¬"
-                                    ? "not-mode"
-                                    : ""
-                                }
-                                onClick={() => handleDigitClick("4")}
+                                className={leftChar === "4" ? "not-mode" : ""}
+                                onClick={() => {
+                                  handleDigitClick("4");
+                                  setShowError(false);
+                                }}
                               />
                             </div>
 
@@ -854,13 +935,20 @@ export default function App() {
                                   )
                                 }
                               />
-                              <Key label="⌫" onClick={backspace} />
+                              <Key
+                                label="⌫"
+                                onClick={() => {
+                                  backspace();
+                                  setShowError(false);
+                                }}
+                              />
                               <Key
                                 label="クリア"
                                 wide
                                 onClick={() => {
                                   setCurrentInput("");
                                   setCursor(0);
+                                  setShowError(false);
                                 }}
                               />
                               <Key
@@ -871,6 +959,8 @@ export default function App() {
                                   if (isValidExpression(currentInput)) {
                                     setText(currentInput);
                                     setEditing(false);
+                                  } else {
+                                    setShowError(true);
                                   }
                                 }}
                               />

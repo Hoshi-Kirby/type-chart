@@ -350,6 +350,10 @@ table tr:nth-child(18) {
 .not-mode {
   text-decoration: overline;
 }
+.error-char {
+  color: #e44;
+  font-weight: bold;
+}
 @keyframes blink {
   50% {
     opacity: 0;
