@@ -1,7 +1,7 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { TypeChartTable } from "./TypeChart";
 import { DualTypeChartTable } from "./DualTypeChart";
 import { CoverTypeChartTable } from "./CoverTypeChart";
@@ -224,6 +224,7 @@ export default function App() {
   const [currentInput, setCurrentInput] = useState<string>("1⋂2⋂3⋂4");
   const [editing, setEditing] = useState(true);
   const [showError, setShowError] = useState(false);
+  const displayRef = useRef<HTMLDivElement>(null);
 
   const [atkTypesC, setAtkTypesC] = useState<TypeName[]>(["-", "-", "-", "-"]);
   const [atkMagniC, setAtkMagniC] = useState<number[]>([1, 1, 1, 1]);
@@ -235,6 +236,18 @@ export default function App() {
     gutsy: false, // 肝っ玉
   });
 
+  useEffect(() => {
+    const box = displayRef.current;
+    const cursorEl = document.getElementById("cursor");
+
+    if (!box || !cursorEl) return;
+
+    const cursorX = cursorEl.offsetLeft;
+    const boxWidth = box.clientWidth;
+
+    // カーソルが中央に来るようにスクロール
+    box.scrollLeft = cursorX - boxWidth / 2;
+  }, [currentInput, cursor]);
   useEffect(() => {
     fetch("/type.json")
       .then((res) => res.json())
@@ -282,7 +295,7 @@ export default function App() {
     // カーソルを表示位置に挿入
     const cursorPos = cursor * 2; // 文字とgapが交互なので2倍
     rendered[cursorPos] = (
-      <span key={`cursor-${cursor}`} className="cursor"></span>
+      <span key={`cursor-${cursor}`} id="cursor" className="cursor"></span>
     );
 
     return <div className="logic-display">{rendered}</div>;
@@ -481,114 +494,108 @@ export default function App() {
       <div className="app-wrapper">
         <div className="container">
           <h1 className="title">タイプ相性表</h1>
-          {help === false ? (
-            <button className="help-button" onClick={() => setHelp(true)}>
-              使い方∨
-            </button>
-          ) : (
-            <>
-              <button className="help-button" onClick={() => setHelp(false)}>
-                使い方∧
-              </button>
-              <div className={`help-panel ${help ? "open" : ""}`}>
-                <div className="header">
-                  <button
-                    className="help-button"
-                    onClick={() => setHelpPage(helpPage > 1 ? helpPage - 1 : 1)}
-                  >
-                    ＜
-                  </button>
-                  <p>{helpPage}/7</p>
-                  <button
-                    className="help-button"
-                    onClick={() => setHelpPage(helpPage < 7 ? helpPage + 1 : 7)}
-                  >
-                    ＞
-                  </button>
-                </div>
-                {helpPage === 1 ? (
-                  <>
-                    <h4>このサイトについて</h4>
-                    <div>
-                      このサイトは全世代、複合タイプ対応のタイプ相性表です。
-                    </div>
-                    <div>また、四つの技の技範囲を見ることもできます。</div>
-                    <div className="hr">
-                      世代を選択することで、過去作の相性で調べることができます。
-                    </div>
-                  </>
-                ) : helpPage === 2 ? (
-                  <>
-                    <h4>モード：タイプ相性</h4>
-                    <div>よく見るタイプ相性表です。</div>
-                  </>
-                ) : helpPage === 3 ? (
-                  <>
-                    <h4>モード：対複合相性</h4>
-                    <div>複合タイプのタイプ相性表です。</div>
-                    <div className="hr">
-                      攻撃するタイプを選択すると、複合タイプに対する相性を見ることができます。
-                    </div>
-                  </>
-                ) : helpPage === 4 ? (
-                  <>
-                    <h4>モード：技範囲</h4>
-                    <div className="hr">
-                      攻撃するタイプを複数入力して、それぞれの複合タイプに対して最善の技を打った場合の相性が表示されます。
-                    </div>
-                    <div className="hr">
-                      テラバーストやウェザーボールなどの一つの技で二タイプ使える技は、「例外」の欄を利用してください。
-                    </div>
-                    <div className="hr">
-                      相手の特性を考慮する場合、相手の特性によって最善の相性が変化する可能性がある複合タイプを赤色で示します。
-                    </div>
-                    <div className="hr">
-                      また、その特性はタップまたはマウスオーバーすることで見ることができます。
-                    </div>
-                  </>
-                ) : helpPage === 5 ? (
-                  <>
-                    <h4>モード：複合耐性</h4>
-                    <div className="hr">
-                      選択した複合タイプに対する全タイプの相性を見ることができます。
-                    </div>
-                    <div className="hr">六匹同時に見ることができます。</div>
-                  </>
-                ) : helpPage === 6 ? (
-                  <>
-                    <h4>モード：相性条件</h4>
-                    <div className="hr">
-                      四つの技のタイプと相性の条件を入力すると、その条件をすべて満たす複合タイプを調べることができます。
-                    </div>
-                    <div className="hr">
-                      条件式は変更することが出来て、自分で入力することもできます。また、notは数字キーをダブルクリックすることで使用できます。
-                    </div>
-                    <div className="hr">
-                      相手の特性を考慮する場合、相手の特性によって条件を満たすことのできる複合タイプを赤色で示します。
-                    </div>
-                    <div className="hr">
-                      また、その特性はタップまたはマウスオーバーすることで見ることができます。
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h4>相手の特性を考慮　について</h4>
-
-                    <div className="hr">
-                      考慮する特性は、ふゆう、どしょく、ちくでん、ひらいしん、でんきエンジン、ちょすい、よびみず、もらいび、こんがりボディ、そうしょく、あついしぼう、かんそうはだ、たいねつ、きよめのしお、すいほうです。
-                    </div>
-                    <div className="hr">
-                      また、それぞれの世代においてある特性を持ったポケモンが存在しないタイプではその特性は考慮しません。
-                    </div>
-                    <div className="hr">
-                      かんそうはだへの炎技は1.25倍で計算していますが、かんそうはだへの炎技がかんそうはだではない同じタイプへの水技よりも低い倍率になるポケモンがZA以前に存在しないため、相性表の記号に影響はありません。
-                    </div>
-                  </>
-                )}
-                <hr className="hr"></hr>
+          <button className="help-button" onClick={() => setHelp(!help)}>
+            {help ? "使い方∧" : "使い方∨"}
+          </button>
+          <>
+            <div className={`help-panel ${help ? "open" : ""}`}>
+              <div className="header">
+                <button
+                  className="help-button"
+                  onClick={() => setHelpPage(helpPage > 1 ? helpPage - 1 : 1)}
+                >
+                  ＜
+                </button>
+                <p>{helpPage}/7</p>
+                <button
+                  className="help-button"
+                  onClick={() => setHelpPage(helpPage < 7 ? helpPage + 1 : 7)}
+                >
+                  ＞
+                </button>
               </div>
-            </>
-          )}
+              {helpPage === 1 ? (
+                <>
+                  <h4>このサイトについて</h4>
+                  <div>
+                    このサイトは全世代、複合タイプ対応のタイプ相性表です。
+                  </div>
+                  <div>また、四つの技の技範囲を見ることもできます。</div>
+                  <div className="hr">
+                    世代を選択することで、過去作の相性で調べることができます。
+                  </div>
+                </>
+              ) : helpPage === 2 ? (
+                <>
+                  <h4>モード：タイプ相性</h4>
+                  <div>よく見るタイプ相性表です。</div>
+                </>
+              ) : helpPage === 3 ? (
+                <>
+                  <h4>モード：対複合相性</h4>
+                  <div>複合タイプのタイプ相性表です。</div>
+                  <div className="hr">
+                    攻撃するタイプを選択すると、複合タイプに対する相性を見ることができます。
+                  </div>
+                </>
+              ) : helpPage === 4 ? (
+                <>
+                  <h4>モード：技範囲</h4>
+                  <div className="hr">
+                    攻撃するタイプを複数入力して、それぞれの複合タイプに対して最善の技を打った場合の相性が表示されます。
+                  </div>
+                  <div className="hr">
+                    テラバーストやウェザーボールなどの一つの技で二タイプ使える技は、「例外」の欄を利用してください。
+                  </div>
+                  <div className="hr">
+                    相手の特性を考慮する場合、相手の特性によって最善の相性が変化する可能性がある複合タイプを赤色で示します。
+                  </div>
+                  <div className="hr">
+                    また、その特性はタップまたはマウスオーバーすることで見ることができます。
+                  </div>
+                </>
+              ) : helpPage === 5 ? (
+                <>
+                  <h4>モード：複合耐性</h4>
+                  <div className="hr">
+                    選択した複合タイプに対する全タイプの相性を見ることができます。
+                  </div>
+                  <div className="hr">六匹同時に見ることができます。</div>
+                </>
+              ) : helpPage === 6 ? (
+                <>
+                  <h4>モード：相性条件</h4>
+                  <div className="hr">
+                    四つの技のタイプと相性の条件を入力すると、その条件をすべて満たす複合タイプを調べることができます。
+                  </div>
+                  <div className="hr">
+                    条件式は変更することが出来て、自分で入力することもできます。また、notは数字キーをダブルクリックすることで使用できます。
+                  </div>
+                  <div className="hr">
+                    相手の特性を考慮する場合、相手の特性によって条件を満たすことのできる複合タイプを赤色で示します。
+                  </div>
+                  <div className="hr">
+                    また、その特性はタップまたはマウスオーバーすることで見ることができます。
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h4>相手の特性を考慮　について</h4>
+
+                  <div className="hr">
+                    考慮する特性は、ふゆう、どしょく、ちくでん、ひらいしん、でんきエンジン、ちょすい、よびみず、もらいび、こんがりボディ、そうしょく、あついしぼう、かんそうはだ、たいねつ、きよめのしお、すいほうです。
+                  </div>
+                  <div className="hr">
+                    また、それぞれの世代においてある特性を持ったポケモンが存在しないタイプではその特性は考慮しません。
+                  </div>
+                  <div className="hr">
+                    かんそうはだへの炎技は1.25倍で計算していますが、かんそうはだへの炎技がかんそうはだではない同じタイプへの水技よりも低い倍率になるポケモンがZA以前に存在しないため、相性表の記号に影響はありません。
+                  </div>
+                </>
+              )}
+              <hr className="hr"></hr>
+            </div>
+          </>
 
           <div className="layout-row">
             <p>世代</p>
@@ -847,7 +854,7 @@ export default function App() {
                       {editing && (
                         <div className="logic-editor">
                           {/* 入力欄（カーソル付き） */}
-                          <div className="display-box">
+                          <div className="display-box" ref={displayRef}>
                             <LogicDisplay
                               currentInput={currentInput}
                               cursor={cursor}
