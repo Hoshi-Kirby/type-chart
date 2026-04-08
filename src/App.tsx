@@ -285,7 +285,7 @@ export default function App() {
       rendered.push(
         <span key={`c-${i}`} className={className.trim()}>
           {base}
-        </span>
+        </span>,
       );
 
       // gap を入れる（カーソルがここに来る可能性がある）
@@ -346,7 +346,7 @@ export default function App() {
     const pos = cursor - 1;
 
     setCurrentInput(
-      currentInput.slice(0, pos) + newChar + currentInput.slice(pos + 1)
+      currentInput.slice(0, pos) + newChar + currentInput.slice(pos + 1),
     );
 
     // カーソル位置はそのまま（1文字置換なのでズレない）
@@ -518,7 +518,7 @@ export default function App() {
                 <>
                   <h4>このサイトについて</h4>
                   <div>
-                    このサイトは全世代、複合タイプ対応のタイプ相性表です。
+                    このサイトは全世代、複合タイプ対応のポケモンタイプ相性表です。
                   </div>
                   <div>また、四つの技の技範囲を見ることもできます。</div>
                   <div className="hr">
@@ -551,7 +551,7 @@ export default function App() {
                     相手の特性を考慮する場合、相手の特性によって最善の相性が変化する可能性がある複合タイプを赤色で示します。
                   </div>
                   <div className="hr">
-                    また、その特性はタップまたはマウスオーバーすることで見ることができます。
+                    また、その特性はタップまたはホバーすることで見ることができます。
                   </div>
                 </>
               ) : helpPage === 5 ? (
@@ -938,7 +938,7 @@ export default function App() {
                                 label="→"
                                 onClick={() =>
                                   setCursor(
-                                    Math.min(currentInput.length, cursor + 1)
+                                    Math.min(currentInput.length, cursor + 1),
                                   )
                                 }
                               />
