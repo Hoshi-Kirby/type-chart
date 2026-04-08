@@ -750,8 +750,9 @@ export default function App() {
                   <span className="x4">◎</span>:×4　
                   <span className="x2">○</span>:×2　
                   <span className="x05">△</span>:×0.5　
-                  <span className="x025">⟁</span>
-                  :×0.25　<span className="x0">×</span>:×0
+                  <span className="x025">⟁</span>:×0.25　
+                  <span className="x0125">▲</span>:×0.125　
+                  <span className="x0">×</span>:×0
                 </div>
               </div>
             </>

@@ -30,7 +30,10 @@ body,
   font-size: 36px;
   font-weight: 400;
   color: #b5e1ffe0;
-  text-shadow: 0 0 2px #004576, 0 0 10px #6fc4fde0, 0 0 10px #6fc4fde0;
+  text-shadow:
+    0 0 2px #004576,
+    0 0 10px #6fc4fde0,
+    0 0 10px #6fc4fde0;
   letter-spacing: 1px;
 }
 .help-button {
@@ -47,7 +50,10 @@ body,
   overflow: hidden;
   opacity: 0;
   transform: translateY(-10px);
-  transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    max-height 0.4s ease,
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 /* 開いたとき */
@@ -117,7 +123,9 @@ body,
 .x025 {
   color: rgb(1, 1, 141);
 }
-
+.x0125 {
+  color: rgb(0, 0, 110);
+}
 .x0 {
   color: black;
   font-weight: bold;

@@ -135,6 +135,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     if (eff === 2) return "○";
     if (eff === 0.5) return "△";
     if (eff === 0.25) return "⟁";
+    if (eff === 0.125) return "▲";
     if (eff === 0) return "×";
     return "";
   }
@@ -143,13 +144,14 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     if (eff === 2) return "eff-super";
     if (eff === 0.5) return "eff-notvery";
     if (eff === 0.25) return "eff-notvery2";
+    if (eff === 0.125) return "eff-notvery3";
     if (eff === 0) return "eff-immune";
     return "eff-normal";
   }
 
   function mergeAbility(base: any, delta: any) {
     const result: Record<string, TypeName[][]> = JSON.parse(
-      JSON.stringify(base)
+      JSON.stringify(base),
     );
 
     for (const ability in delta) {
@@ -161,8 +163,8 @@ export const CoverTypeChartTable: React.FC<Props> = ({
       result[ability] = result[ability].filter(
         (t) =>
           !remove.some(
-            (r: TypeName[]) => JSON.stringify(r) === JSON.stringify(t)
-          )
+            (r: TypeName[]) => JSON.stringify(r) === JSON.stringify(t),
+          ),
       );
 
       // add
@@ -175,7 +177,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     abilityName: string,
     type1: TypeName,
     type2: TypeName,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): boolean {
     const list = abilityForGen[abilityName];
     if (!list) return false;
@@ -205,7 +207,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     chart: TypeChart,
     gen: Gen,
     gutsy: boolean,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): number {
     let maxEff = 0;
 
@@ -218,7 +220,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         abilityName,
-        abilityForGen
+        abilityForGen,
       );
       if (eff > maxEff) maxEff = eff;
     }
@@ -233,7 +235,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     gen: Gen,
     gutsy: boolean,
     levitate: boolean,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): { eff: number; abilities: string[] } {
     const abilityNames = Object.keys(abilityForGen);
 
@@ -246,7 +248,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
       chart,
       gen,
       gutsy,
-      abilityForGen
+      abilityForGen,
     );
     let bestEff = firstEff;
     let betterAbilities: string[] = [];
@@ -262,7 +264,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
           chart,
           gen,
           gutsy,
-          abilityForGen
+          abilityForGen,
         );
 
         if (eff < firstEff) betterAbilities.push(ability);
@@ -284,7 +286,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
     gen: Gen,
     gutsy: boolean,
     avilityName: string,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): number {
     let eff: number;
     // ① タイプ無し
@@ -323,7 +325,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         avilityName,
-        abilityForGen
+        abilityForGen,
       );
       let effFly = calcEff(
         "飛",
@@ -333,7 +335,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         avilityName,
-        abilityForGen
+        abilityForGen,
       );
 
       return effFight * effFly;
@@ -482,7 +484,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -503,7 +505,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) * 1.25
           );
         }
@@ -521,7 +523,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -539,7 +541,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -557,7 +559,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -615,7 +617,7 @@ export const CoverTypeChartTable: React.FC<Props> = ({
                 gen,
                 gutsy,
                 levitate,
-                abilityForGen
+                abilityForGen,
               );
 
               return (
