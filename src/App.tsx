@@ -9,7 +9,7 @@ import { ResistTypeChartTable } from "./ResistTypeChart";
 import { ConditionTypeChartTable } from "./ConditionTypeChart";
 import type { TypeName } from "./value";
 
-type Gen = "gen1" | "gen2" | "gen3" | "gen4";
+type Gen = "gen0" | "gen1" | "gen2" | "gen3" | "gen4";
 const typeLabels: Record<TypeName, string> = {
   普: "ノーマル",
   炎: "ほのお",
@@ -33,6 +33,26 @@ const typeLabels: Record<TypeName, string> = {
 };
 
 const atkTypesByGen: Record<Gen, TypeName[]> = {
+  gen0: [
+    "普",
+    "炎",
+    "水",
+    "電",
+    "草",
+    "氷",
+    "闘",
+    "毒",
+    "地",
+    "飛",
+    "超",
+    "虫",
+    "岩",
+    "霊",
+    "竜",
+    "悪",
+    "鋼",
+    "妖",
+  ],
   gen1: [
     "普",
     "炎",
@@ -111,6 +131,26 @@ const atkTypesByGen: Record<Gen, TypeName[]> = {
   ],
 };
 const defTypesByGen: Record<Gen, TypeName[]> = {
+  gen0: [
+    "普",
+    "炎",
+    "水",
+    "草",
+    "電",
+    "氷",
+    "闘",
+    "毒",
+    "地",
+    "飛",
+    "超",
+    "虫",
+    "岩",
+    "霊",
+    "竜",
+    "悪",
+    "鋼",
+    "妖",
+  ],
   gen1: [
     "普",
     "炎",
@@ -600,6 +640,7 @@ export default function App() {
           <div className="layout-row">
             <p>世代</p>
             <select value={gen} onChange={(e) => setGen(e.target.value as Gen)}>
+              <option value="gen0">チャンピオンズ</option>
               <option value="gen1">赤緑</option>
               <option value="gen2">金銀～BW</option>
               <option value="gen3">XY～</option>
@@ -686,7 +727,9 @@ export default function App() {
                               {typeLabels[type]}
                             </option>
                           ))}
-                          {(gen === "gen3" || gen === "gen4") && (
+                          {(gen === "gen0" ||
+                            gen === "gen3" ||
+                            gen === "gen4") && (
                             <>
                               <option value="1">フリーズドライ</option>
                               <option value="2">フライングプレス</option>
@@ -703,7 +746,10 @@ export default function App() {
                     ))}
                   </div>
                 </div>
-                {(gen === "gen2" || gen === "gen3" || gen === "gen4") && (
+                {(gen === "gen0" ||
+                  "gen2" ||
+                  gen === "gen3" ||
+                  gen === "gen4") && (
                   <>
                     <h3>特性</h3>
                     <label>
@@ -1005,7 +1051,9 @@ export default function App() {
                             </option>
                           ))}
                           {/* 特殊技 */}
-                          {(gen === "gen3" || gen === "gen4") && (
+                          {(gen === "gen0" ||
+                            gen === "gen3" ||
+                            gen === "gen4") && (
                             <>
                               <option value="1">フリーズドライ</option>
                               <option value="2">フライングプレス</option>
@@ -1058,7 +1106,10 @@ export default function App() {
                     ))}
                   </div>
                 </div>
-                {(gen === "gen2" || gen === "gen3" || gen === "gen4") && (
+                {(gen === "gen0" ||
+                  gen === "gen2" ||
+                  gen === "gen3" ||
+                  gen === "gen4") && (
                   <>
                     <h3>特性</h3>
                     <label>

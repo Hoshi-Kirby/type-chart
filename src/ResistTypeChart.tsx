@@ -9,7 +9,7 @@ type TypeChart = {
   };
 };
 
-type Gen = "gen1" | "gen2" | "gen3" | "gen4";
+type Gen = "gen0" | "gen1" | "gen2" | "gen3" | "gen4";
 
 type Props = {
   defTypes: TypeName[];
@@ -18,6 +18,26 @@ type Props = {
 };
 
 const atkTypesByGen: Record<Gen, TypeName[]> = {
+  gen0: [
+    "普",
+    "炎",
+    "水",
+    "電",
+    "草",
+    "氷",
+    "闘",
+    "毒",
+    "地",
+    "飛",
+    "超",
+    "虫",
+    "岩",
+    "霊",
+    "竜",
+    "悪",
+    "鋼",
+    "妖",
+  ],
   gen1: [
     "普",
     "炎",

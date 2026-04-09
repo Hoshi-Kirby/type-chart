@@ -13,7 +13,7 @@ type TypeChart = {
   };
 };
 
-type Gen = "gen1" | "gen2" | "gen3" | "gen4";
+type Gen = "gen0" | "gen1" | "gen2" | "gen3" | "gen4";
 
 type Props = {
   atkTypesC: AttackType[];
@@ -27,6 +27,26 @@ type Props = {
 };
 
 const defTypesByGen: Record<Gen, TypeName[]> = {
+  gen0: [
+    "普",
+    "炎",
+    "水",
+    "電",
+    "草",
+    "氷",
+    "闘",
+    "毒",
+    "地",
+    "飛",
+    "超",
+    "虫",
+    "岩",
+    "霊",
+    "竜",
+    "悪",
+    "鋼",
+    "妖",
+  ],
   gen1: [
     "普",
     "炎",
@@ -125,6 +145,8 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       return mergeAbility(abilityData.gen2, abilityData.gen3);
     } else if (gen === "gen4") {
       return mergeAbility(abilityData.gen2, abilityData.gen4);
+    } else if (gen === "gen0") {
+      return abilityData.gen0;
     } else {
       return {}; // gen1 は特性なし
     }
@@ -147,7 +169,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
 
   function mergeAbility(base: any, delta: any) {
     const result: Record<string, TypeName[][]> = JSON.parse(
-      JSON.stringify(base)
+      JSON.stringify(base),
     );
 
     for (const ability in delta) {
@@ -159,8 +181,8 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       result[ability] = result[ability].filter(
         (t) =>
           !remove.some(
-            (r: TypeName[]) => JSON.stringify(r) === JSON.stringify(t)
-          )
+            (r: TypeName[]) => JSON.stringify(r) === JSON.stringify(t),
+          ),
       );
 
       // add
@@ -173,7 +195,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     abilityName: string,
     type1: TypeName,
     type2: TypeName,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): boolean {
     const list = abilityForGen[abilityName];
     if (!list) return false;
@@ -220,7 +242,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     gen: Gen,
     gutsy: boolean,
     abilityName: string,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): boolean[] {
     const okList: boolean[] = [];
 
@@ -239,7 +261,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         abilityName,
-        abilityForGen
+        abilityForGen,
       );
 
       const target = atkMagniC[i];
@@ -276,7 +298,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     gutsy: boolean,
     abilityName: string,
     abilityForGen: Record<string, string[][]>,
-    text: string
+    text: string,
   ) {
     const okList = checkAllConditionsRaw(
       atkTypesC,
@@ -288,7 +310,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       gen,
       gutsy,
       abilityName,
-      abilityForGen
+      abilityForGen,
     );
 
     const jsExpr = convertExpression(text); // さっき作った変換関数
@@ -307,7 +329,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     gen: Gen,
     gutsy: boolean,
     levitate: boolean,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): { ok: boolean; abilities: string[] } {
     const abilityNames = Object.keys(abilityForGen);
 
@@ -323,7 +345,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
       gutsy,
       "",
       abilityForGen,
-      text
+      text,
     );
 
     let okAbilities: string[] = [];
@@ -342,7 +364,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
           gutsy,
           ability,
           abilityForGen,
-          text
+          text,
         );
 
         // 特性なしでは満たさないが、この特性では満たす
@@ -374,7 +396,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
     gen: Gen,
     gutsy: boolean,
     avilityName: string,
-    abilityForGen: Record<string, string[][]>
+    abilityForGen: Record<string, string[][]>,
   ): number {
     let eff: number;
     // ① タイプ無し
@@ -413,7 +435,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         avilityName,
-        abilityForGen
+        abilityForGen,
       );
       let effFly = calcEff(
         "飛",
@@ -423,7 +445,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
         gen,
         gutsy,
         avilityName,
-        abilityForGen
+        abilityForGen,
       );
 
       return effFight * effFly;
@@ -572,7 +594,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -593,7 +615,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) * 1.25
           );
         }
@@ -611,7 +633,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -629,7 +651,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -647,7 +669,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
               gen,
               gutsy,
               "",
-              abilityForGen
+              abilityForGen,
             ) / 2
           );
         }
@@ -707,7 +729,7 @@ export const ConditionTypeChartTable: React.FC<Props> = ({
                 gen,
                 gutsy,
                 levitate,
-                abilityForGen
+                abilityForGen,
               );
 
               return (
