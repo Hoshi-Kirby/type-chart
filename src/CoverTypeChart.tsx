@@ -431,6 +431,13 @@ export const CoverTypeChartTable: React.FC<Props> = ({
         }
       }
     }
+    if (avilityName == "うなぎのぼり") {
+      if (hasAbilityType(avilityName, type1, type2, abilityForGen)) {
+        if (atkType === "地") {
+          return 0;
+        }
+      }
+    }
     if (avilityName == "どしょく") {
       if (hasAbilityType(avilityName, type1, type2, abilityForGen)) {
         if (atkType === "地") {
