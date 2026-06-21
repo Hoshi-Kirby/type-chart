@@ -623,7 +623,7 @@ export default function App() {
                   <h4>相手の特性を考慮　について</h4>
 
                   <div className="hr">
-                    考慮する特性は、ふゆう、どしょく、ちくでん、ひらいしん、でんきエンジン、ちょすい、よびみず、もらいび、こんがりボディ、そうしょく、あついしぼう、かんそうはだ、たいねつ、きよめのしお、すいほうです。
+                    考慮する特性は、ふゆう、どしょく、ちくでん、ひらいしん、でんきエンジン、うなぎのぼり、ちょすい、よびみず、もらいび、こんがりボディ、そうしょく、あついしぼう、かんそうはだ、たいねつ、きよめのしお、すいほうです。
                   </div>
                   <div className="hr">
                     また、それぞれの世代においてある特性を持ったポケモンが存在しないタイプではその特性は考慮しません。
@@ -640,10 +640,10 @@ export default function App() {
           <div className="layout-row">
             <p>世代</p>
             <select value={gen} onChange={(e) => setGen(e.target.value as Gen)}>
-              <option value="gen0">チャンピオンズ</option>
+              <option value="gen0">チャンピオンズM-B</option>
               <option value="gen1">赤緑</option>
               <option value="gen2">金銀～BW</option>
-              <option value="gen3">XY～</option>
+              <option value="gen3">XY～ZA</option>
               <option value="gen4">さかさ</option>
             </select>
           </div>
