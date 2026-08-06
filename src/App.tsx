@@ -302,18 +302,20 @@ export default function App() {
   function removeTab(index: number) {
     const newSets = atkTypeSets.filter((_, i) => i !== index);
 
-    //  タブ一覧を更新
-    setAtkTypeSets(newSets);
-
     if (activeIndex === index) {
       if (index === newSets.length) {
         // 削除したのが最後のタブだった → 1つ左へ
         setActiveIndex(index - 1);
+        setAtkTypes(atkTypeSets[index - 1]);
+      } else {
+        setAtkTypes(atkTypeSets[index + 1]);
       }
     } else if (activeIndex > index) {
       // 選択中タブが後ろにあった → 1つ前に詰まる
       setActiveIndex(activeIndex - 1);
     }
+    //  タブ一覧を更新
+    setAtkTypeSets(newSets);
   }
   // タブの追加
   function addTab() {
