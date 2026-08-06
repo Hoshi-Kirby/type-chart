@@ -266,10 +266,60 @@ table tr:nth-child(18) {
   white-space: nowrap;
 }
 
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #eee;
+  cursor: pointer;
+  color: white;
+  border: 1px solid transparent;
+  font-size: 12px;
+}
+
+.tab.active {
+  background: #3f5b63;
+  border-color: #5892be;
+}
+.close {
+  margin-left: 6px;
+  cursor: pointer;
+  color: rgb(0, 0, 0);
+}
+
+.close:hover {
+  color: #ff6666;
+}
+
+.add-tab {
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #eee;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.add-tab:hover {
+  background: #d0f0ff;
+}
+
 /* 防御 */
 .def-grid {
   display: grid;
-  grid-template-columns: auto auto; /* ← fr をやめて auto にする */
+  grid-template-columns: auto auto;
   gap: 2px 24px;
   margin-top: 8px;
   justify-content: start; /* ← グリッド全体を左寄せ */
@@ -450,6 +500,16 @@ table tr:nth-child(18) {
   .key.decision {
     background: #d0f0ff;
     border-color: #5892be;
+  }
+
+  .tab {
+    background: #eee;
+    color: rgb(0, 0, 0);
+  }
+
+  .tab.active {
+    background: #d0f0ff;
+    border-color: rgb(0, 93, 155);
   }
 }
 

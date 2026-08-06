@@ -244,6 +244,11 @@ export default function App() {
     "-",
     "-",
   ]);
+  const [atkTypeSets, setAtkTypeSets] = useState<TypeName[][]>([
+    ["-", "-", "-", "-", "-", "-"], // タブ1
+  ]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const [defTypes, setDefTypes] = useState<TypeName[]>([
     "-",
     "-",
@@ -293,6 +298,42 @@ export default function App() {
       .then((res) => res.json())
       .then((data) => setAllCharts(data));
   }, []);
+  // タブの削除
+  function removeTab(index: number) {
+    const newSets = atkTypeSets.filter((_, i) => i !== index);
+
+    //  タブ一覧を更新
+    setAtkTypeSets(newSets);
+
+    if (activeIndex === index) {
+      if (index === newSets.length) {
+        // 削除したのが最後のタブだった → 1つ左へ
+        setActiveIndex(index - 1);
+      }
+    } else if (activeIndex > index) {
+      // 選択中タブが後ろにあった → 1つ前に詰まる
+      setActiveIndex(activeIndex - 1);
+    }
+  }
+  // タブの追加
+  function addTab() {
+    if (atkTypeSets.length >= 4) {
+      return; // これ以上追加しない
+    }
+
+    const last = atkTypeSets[atkTypeSets.length - 1];
+    const newSets = [...atkTypeSets, [...last]];
+
+    setAtkTypeSets(newSets);
+    setActiveIndex(newSets.length - 1);
+    setAtkTypes([...last]);
+  }
+
+  // タブの選択
+  function selectTab(index: number) {
+    setActiveIndex(index);
+    setAtkTypes(atkTypeSets[index]);
+  }
 
   //  キー
   const leftChar = currentInput[cursor - 1];
@@ -707,7 +748,39 @@ export default function App() {
             <>
               <div style={{ width: "100%" }}>
                 <div className="cover-types">
-                  <h3>攻撃タイプ</h3>
+                  <div className="title-row">
+                    <h3>攻撃タイプ</h3>
+                    <div className="tabs">
+                      {atkTypeSets.map((_, i) => (
+                        <div
+                          key={i}
+                          className={i === activeIndex ? "tab active" : "tab"}
+                          onClick={() => selectTab(i)}
+                        >
+                          技セット {i + 1}
+                          {/* × ボタン（タブが2個以上のときだけ表示） */}
+                          {atkTypeSets.length >= 2 && (
+                            <span
+                              className="close"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeTab(i);
+                              }}
+                            >
+                              ×
+                            </span>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* ＋ ボタン（タブが3個以下のときだけ表示） */}
+                      {atkTypeSets.length <= 3 && (
+                        <div className="add-tab" onClick={addTab}>
+                          ＋
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="atk-grid">
                     {atkTypes.map((t, i) => (
@@ -718,7 +791,12 @@ export default function App() {
                           onChange={(e) => {
                             const newArr = [...atkTypes];
                             newArr[i] = e.target.value as TypeName;
+
                             setAtkTypes(newArr);
+
+                            const newSets = [...atkTypeSets];
+                            newSets[activeIndex] = newArr;
+                            setAtkTypeSets(newSets);
                           }}
                         >
                           <option value="-">-</option> {}
