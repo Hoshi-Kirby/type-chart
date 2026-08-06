@@ -223,6 +223,10 @@ table tr:nth-child(18) {
   font-weight: bold;
   position: relative;
 }
+/* 見出しは折り返さない */
+h3 {
+  white-space: nowrap;
+}
 
 /* 補完 */
 .atk-grid {
@@ -275,17 +279,21 @@ table tr:nth-child(18) {
 
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .tab {
   padding: 3px 6px;
   border-radius: 4px;
-  background: #eee;
-  cursor: pointer;
+  flex: 0 0 auto;
+  min-width: 60px;
+  background: #242424;
   color: white;
+  cursor: pointer;
   border: 1px solid transparent;
   font-size: 12px;
+  border: 1px solid #6d6d6d;
 }
 
 .tab.active {
@@ -295,17 +303,17 @@ table tr:nth-child(18) {
 .close {
   margin-left: 6px;
   cursor: pointer;
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 }
 
 .close:hover {
-  color: #ff6666;
+  color: #dc9d9d;
 }
 
 .add-tab {
   padding: 3px 6px;
   border-radius: 4px;
-  background: #eee;
+  background: #242424;
   cursor: pointer;
   border: 1px solid transparent;
   font-size: 12px;
@@ -313,7 +321,7 @@ table tr:nth-child(18) {
 }
 
 .add-tab:hover {
-  background: #d0f0ff;
+  background: #3f5b63;
 }
 
 /* 防御 */
@@ -438,7 +446,7 @@ table tr:nth-child(18) {
   flex: 1;
   padding: 6px 0; /* ← 小さく */
   font-size: 15px; /* ← 小さく */
-  background: #141414;
+  background: #242424;
   border: 1px solid #6d6d6d;
   border-radius: 4px; /* ← 小さく */
 }
@@ -510,6 +518,21 @@ table tr:nth-child(18) {
   .tab.active {
     background: #d0f0ff;
     border-color: rgb(0, 93, 155);
+  }
+  .close {
+    color: rgb(0, 0, 0);
+  }
+
+  .close:hover {
+    color: #ff6666;
+  }
+
+  .add-tab {
+    background: #eee;
+  }
+
+  .add-tab:hover {
+    background: #d0f0ff;
   }
 }
 
