@@ -232,7 +232,7 @@ export default function App() {
   const [help, setHelp] = useState<boolean>(false);
   const [helpPage, setHelpPage] = useState<number>(1);
   const [allCharts, setAllCharts] = useState<any>({});
-  const [gen, setGen] = useState<Gen>("gen3");
+  const [gen, setGen] = useState<Gen>("gen0");
   const chartForGen = gen === "gen4" ? allCharts["gen3"] : allCharts[gen];
   const [mode, setMode] = useState("single");
   const [atkType, setAtkType] = useState<TypeName>("普");
@@ -683,7 +683,7 @@ export default function App() {
           <div className="layout-row">
             <p>世代</p>
             <select value={gen} onChange={(e) => setGen(e.target.value as Gen)}>
-              <option value="gen0">チャンピオンズM-B</option>
+              <option value="gen0">チャンピオンズM-C</option>
               <option value="gen1">赤緑</option>
               <option value="gen2">金銀～BW</option>
               <option value="gen3">XY～ZA</option>
